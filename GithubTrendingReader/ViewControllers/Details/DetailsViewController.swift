@@ -22,7 +22,7 @@ class DetailsViewController: UIViewController {
     // MARK: - Constants
 
     struct PrivateConstants {
-        static let rightBarButtonImage: UIImage? = "githubLogo".image
+        static let rightBarButtonImage: UIImage? = "web".image
         static let alertTitle: String = "swipe_title".localized
         static let alertMessage: String = "swipe_message".localized
     }
