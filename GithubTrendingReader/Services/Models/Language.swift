@@ -13,7 +13,7 @@ import Foundation
 struct Language: Codable {
     // MARK: - Properties
 
-    let popular, all: [All]
+    var popular, all: [All]
 }
 
 // MARK: - All

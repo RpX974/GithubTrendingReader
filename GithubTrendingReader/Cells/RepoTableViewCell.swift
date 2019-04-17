@@ -221,7 +221,7 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         guard let data = data else { return }
         self.nameLabel.attributedText = data.getTitle()
         self.descriptionLabel.text = data.description
-        self.circle.backgroundColor = UIColor.init(hexString: data.languageColor)
+        self.circle.backgroundColor = UIColor.init(hexString: data.languageColor ?? "#FFFFFF")
         self.languageLabel.text = data.language
         self.starLabel.text = data.stars.description
         self.forkLabel.text = data.forks.description
@@ -259,5 +259,20 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
                 iv.sd_setImage(with: url, placeholderImage: nil, options: [SDWebImageOptions.scaleDownLargeImages, SDWebImageOptions.highPriority], completed: nil)
             }
         }
+    }
+}
+
+extension UIScreen {
+    
+    enum SizeType: CGFloat {
+        case Unknown = 0.0
+        case iPhone4 = 960.0
+        case iPhone5 = 1136.0
+    }
+    
+    var sizeType: SizeType {
+        let height = nativeBounds.height
+        guard let sizeType = SizeType(rawValue: height) else { return .Unknown }
+        return sizeType
     }
 }

@@ -11,7 +11,7 @@ import UIKit
 class NavigationController: UINavigationController {
     
     // MARK: - Properties
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return Constants.isDarkModeEnabled ? .lightContent : .default
     }
@@ -24,5 +24,11 @@ class NavigationController: UINavigationController {
         view.backgroundColor = view.getModeColor()
         navigationBar.isTranslucent = false
         navigationBar.prefersLargeTitles = true
+    }
+    
+    func clearNavigationBar() {
+        navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationBar.shadowImage = UIImage()
+        self.view.backgroundColor = .clear
     }
 }

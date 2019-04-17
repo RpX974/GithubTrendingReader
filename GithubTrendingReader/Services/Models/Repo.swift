@@ -29,8 +29,8 @@ class Repo: Codable {
     let author, name: String
     let url: String
     let description: String
-    let language: String
-    let languageColor: String
+    let language: String?
+    let languageColor: String?
     let stars, forks, currentPeriodStars: Int
     let builtBy: [BuiltBy]
     var urlString: String?

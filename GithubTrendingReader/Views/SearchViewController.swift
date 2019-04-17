@@ -43,6 +43,11 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        
+    }
+    
     convenience init(searchResultsController: UIViewController? = nil, placeholder: String?, tintColor: UIColor?, obscuresBackgroundDuringPresentation: Bool = true, dataToFilter: [T]? = nil) {
         self.init(searchResultsController: searchResultsController)
         

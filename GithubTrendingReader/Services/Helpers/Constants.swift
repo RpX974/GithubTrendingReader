@@ -22,8 +22,9 @@ struct Constants {
     static let baseUrl: String = "https://github-trending-api.now.sh/repositories?language=%@&since=%@"
     static let github: String = "https://github.com"
     static let languageURL: String = "https://github-trending-api.now.sh/languages"
-    static let defaultLanguage: String = "Swift"
-    static let defaultLanguageUrlParam: String = "swift"
+    static let allLanguagesURL: String = "https://github-trending-api.now.sh/repositories?since=%@"
+    static let defaultLanguage: String = "All Languages"
+    static let defaultLanguageUrlParam: String = "allLanguages"
     static let maxRecentsCount: Int = 10
     // MARK: - UserDefault
     
@@ -53,5 +54,6 @@ struct Constants {
         static let replacingOf: String = "replacing_of".localized
         static let replacingWith: String = "replacing_with".localized
         static let urlFormat: String = "url_format".localized
+        
     }
 }

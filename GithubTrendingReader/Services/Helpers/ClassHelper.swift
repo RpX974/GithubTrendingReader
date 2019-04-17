@@ -24,6 +24,8 @@ class ClassHelper {
         let barTintColor: UIColor = isDarkModeEnabled ? Colors.darkMode : .white
         let tintColor: UIColor = isDarkModeEnabled ? .white : Colors.darkMode
         let attrs = [NSAttributedString.Key.foregroundColor: tintColor]
+//        let largeAttrs = [NSAttributedString.Key.foregroundColor: tintColor,
+//                          NSAttributedString.Key.font: UIFont.bold(size: 30)]
         UINavigationBar.appearance().titleTextAttributes = attrs
         UINavigationBar.appearance().largeTitleTextAttributes = attrs
         UINavigationBar.appearance().tintColor = tintColor

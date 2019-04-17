@@ -52,7 +52,6 @@ class DetailsViewController: UIViewController {
     var scrollToIndex: ((Int) -> Void)?
     var showWebImage: ((String) -> Void)?
 
-    
     // MARK: - View Configuration
 
     override func viewDidLoad() {
@@ -65,15 +64,22 @@ class DetailsViewController: UIViewController {
         setupNotificationCenter()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
+        self.updateTitle(title: self.title)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         guard first else { return }
-        self.collectionView.scrollToItem(indexPath: .init(item: viewModel.getCurrentIndex(), section: 0), animated: false)
+        DispatchQueue.main.async {
+            self.collectionView.scrollToItem(indexPath: .init(item: self.viewModel.getCurrentIndex(), section: 0), animated: false)
+        }
         first = false
     }
     
@@ -90,6 +96,7 @@ class DetailsViewController: UIViewController {
     }
     
     fileprivate func setupNavigationBar(){
+        navigationItem.largeTitleDisplayMode = .automatic
         navigationItem.setRightBarButton(image: PrivateConstants.rightBarButtonImage, target: self, action: #selector(self.goToSafari), tintColor: view.getModeTextColor())
     }
     

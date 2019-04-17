@@ -49,7 +49,7 @@ class ViewController: UIViewController {
     fileprivate lazy var tableView: TableView<Repo, RepoTableViewCell> = {
         let tableView = TableView<Repo, RepoTableViewCell>(backgroundColor: view.getModeColor(),
                                   estimateRowHeight: 60.0,
-                                  contentInset: .init(top: segmentedControl.height + 20.0, left: 0, bottom: 0, right: 0),
+                                  contentInset: .init(top: segmentedControl.height + 20.0, left: 0, bottom: 10, right: 0),
                                   enableHighlight: true,
                                   noDataText: "no_repo".localized)
         tableView.globalDelegate = self
@@ -72,7 +72,7 @@ class ViewController: UIViewController {
     // MARK: - Properties
 
     fileprivate var lastYOffSet: CGFloat = 0.0
-
+    
     fileprivate lazy var viewModel = HomeViewModel.init(delegate: self)
 
     // MARK: - Constraints
@@ -97,6 +97,20 @@ class ViewController: UIViewController {
         viewModel.start()
     }
     
+    
+    func getHeaderImageHeightForCurrentDevice() -> CGFloat {
+        switch UIScreen.main.nativeBounds.height {
+        case 2436: // iPhone X
+            return 175
+        default: // Every other iPhone
+            return 145
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         segmentedControl.addShadow(radius: 5, opacity: 0.1)
@@ -105,7 +119,7 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        navigationItem.hidesSearchBarWhenScrolling = true
+//        navigationItem.hidesSearchBarWhenScrolling = true
     }
     
     fileprivate func setupUI(){
@@ -123,7 +137,7 @@ class ViewController: UIViewController {
     }
     
     fileprivate func setupNavigationBar(){
-        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.largeTitleDisplayMode = .automatic
         navigationItem.addSearchController(search)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicator)
         navigationItem.setLeftBarButton(image: PrivateConstants.leftBarButtonImage,
@@ -295,7 +309,8 @@ extension ViewController: HomeProtocolDelegate {
     }
     
     func updateLeftButtonBarTitle(languageName: String?, count: Int){
-        self.title = PrivateConstants.titleFormat(string: languageName)
+        self.title = languageName ?? "loading".localized
+//        self.title = PrivateConstants.titleFormat(string: languageName)
         showActivityIndicator(bool: false)
     }
     

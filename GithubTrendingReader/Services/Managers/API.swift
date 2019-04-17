@@ -39,7 +39,12 @@ class API {
     // MARK: - Custom Functions
 
     func getUrlString(from language: String, since: Since) -> String{
-        return String.init(format: Constants.baseUrl, language, since.rawValue)
+        switch language {
+        case Constants.defaultLanguageUrlParam:
+            return String.init(format: Constants.allLanguagesURL, since.rawValue)
+        default:
+            return String.init(format: Constants.baseUrl, language, since.rawValue)
+        }
     }
 
     func retrieveData<T: Codable>(with url: URL, completion: @escaping ResultCompletion<T>){

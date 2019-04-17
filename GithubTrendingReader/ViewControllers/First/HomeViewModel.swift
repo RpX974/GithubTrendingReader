@@ -210,6 +210,9 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
                 case .success(let data):
                     log_info("Languages retrieved")
                     self.language = data
+                    let allLanguages = All.init(urlParam: Constants.defaultLanguageUrlParam,
+                                                name: Constants.defaultLanguage)
+                    self.language?.popular.insert(allLanguages, at: 0)
                     fullfill(())
                 case .failure(let error):
                     reject(error)

@@ -129,16 +129,12 @@ extension UIScrollView {
 extension UITableView {
     func scrollToFirstItem(animated: Bool = true){
         guard self.visibleCells.count > 0 else { return }
-        DispatchQueue.main.async {
-            self.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
-        }
+        self.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
     }
     
     func scrollToRow(indexPath: IndexPath, at position: UITableView.ScrollPosition = .bottom, animated: Bool = true) {
         guard self.visibleCells.count > 0 else { return }
-        DispatchQueue.main.async {
-            self.scrollToRow(at: indexPath, at: position, animated: animated)
-        }
+        self.scrollToRow(at: indexPath, at: position, animated: animated)
     }
 }
 
@@ -146,16 +142,12 @@ extension UITableView {
 extension UICollectionView {
     func scrollToFirstItem(animated: Bool = true){
         guard self.visibleCells.count > 0 else { return }
-        DispatchQueue.main.async {
-            self.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
-        }
+        self.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
     }
     
     func scrollToItem(indexPath: IndexPath, at position: UICollectionView.ScrollPosition = .centeredHorizontally, animated: Bool = true) {
         guard self.visibleCells.count > 0 else { return }
-        DispatchQueue.main.async {
-            self.scrollToItem(at: indexPath, at: position, animated: animated)
-        }
+        self.scrollToItem(at: indexPath, at: position, animated: animated)
     }
 }
 
@@ -216,6 +208,38 @@ extension UIView {
             return UIApplication.shared.keyWindow?.safeAreaInsets ?? .zero
         } else {
             return .zero
+        }
+    }
+ 
+    func adjustLargeTitleSize() {
+        guard let title = title, #available(iOS 11.0, *) else { return }
+        
+        let maxWidth = UIScreen.main.bounds.size.width - 60
+        var fontSize = UIFont.preferredFont(forTextStyle: .largeTitle).pointSize
+        var width = title.size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: fontSize)]).width
+        
+        while width > maxWidth {
+            fontSize -= 1
+            width = title.size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: fontSize)]).width
+        }
+        
+        navigationController?.navigationBar.largeTitleTextAttributes =
+            [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: fontSize)
+        ]
+    }
+}
+
+
+extension UINavigationController {
+    func multiLineNavigationTitle() {
+        navigationBar.subviews.forEach {
+            $0.subviews.forEach { item in
+                if let largeLabel = item as? UILabel {
+                    largeLabel.text = navigationItem.title
+                    largeLabel.numberOfLines = 0
+                    largeLabel.lineBreakMode = .byWordWrapping
+                }
+            }
         }
     }
 }
@@ -316,18 +340,3 @@ extension UINavigationItem {
     }
 }
 
-// MARK: - UIScreen
-extension UIScreen {
-    
-    enum SizeType: CGFloat {
-        case Unknown = 0.0
-        case iPhone4 = 960.0
-        case iPhone5 = 1136.0
-    }
-    
-    var sizeType: SizeType {
-        let height = nativeBounds.height
-        guard let sizeType = SizeType(rawValue: height) else { return .Unknown }
-        return sizeType
-    }
-}
