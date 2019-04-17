@@ -1,0 +1,35 @@
+PODS:
+  - AppImageViewer (1.0.10):
+    - SDWebImage (~> 4.0)
+  - PromisesObjC (1.2.7)
+  - PromisesSwift (1.2.7):
+    - PromisesObjC (= 1.2.7)
+  - SDWebImage (4.4.6):
+    - SDWebImage/Core (= 4.4.6)
+  - SDWebImage/Core (4.4.6)
+  - TinyConstraints (3.3.1)
+
+DEPENDENCIES:
+  - AppImageViewer (~> 1.0.10)
+  - PromisesSwift (~> 1.2.7)
+  - SDWebImage (~> 4.4.6)
+  - TinyConstraints (~> 3.3.1)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - AppImageViewer
+    - PromisesObjC
+    - PromisesSwift
+    - SDWebImage
+    - TinyConstraints
+
+SPEC CHECKSUMS:
+  AppImageViewer: 79cfdebdb787afc0af3a5197482b011b15b847d0
+  PromisesObjC: 7b28ddd1e78cce8f80f1ada927d2217663a9c672
+  PromisesSwift: b27f410f9ea693753cfd4cfd8ac1c60a471f137b
+  SDWebImage: 3f3f0c02f09798048c47a5ed0a13f17b063572d8
+  TinyConstraints: dbf7519aefc01ea59d62244300c7718aec68e280
+
+PODFILE CHECKSUM: cca9bfce6f21fd88a91b1e07b36dbc7ee2dfb465
+
+COCOAPODS: 1.6.1

@@ -1,0 +1,40 @@
+/* 
+  Localizable.strings
+  GithubTrendingReader
+
+  Created by Laurent Grondin on 15/04/2019.
+  Copyright © 2019 Laurent Grondin. All rights reserved.
+*/
+
+"trending"="Trending";
+"loading"="Loading";
+"other_language"="Other Language";
+"daily"="Daily";
+"weekly"="Weekly";
+"monthly"="Monthly";
+"build_by"="Build by";
+"no_repo"="No repository available";
+
+//STRING FORMAT
+"results"="Results (%d)";
+"populars"="Populars (%d)";
+"all_languages"="All (%d)";
+"trending_format"="%@ %@";
+"star_today"="%d star today";
+"stars_today"="%d stars today";
+"recents"="Recents (%d)";
+
+//FILE
+"dark_mode_css"="styleios.css";
+"white_mode_css"="styleios-white.css";
+
+//HTML
+"slice_from"="<div class=\"Box-body\">\n";
+"slice_to"="</div>\n  </div>";
+"replacing_of"="\"/%@/%@/";
+"replacing_with"="\"%@/%@/%@/";
+"url_format"="<link rel=\"stylesheet\" type=\"text/css\" href=\"%@\">\n<div class=\"Box-body\">\n%@\n</div>";
+
+//ALERT
+"swipe_title"="Swipe !";
+"swipe_message"="Swipe to left or right to navigate between all repositories";
