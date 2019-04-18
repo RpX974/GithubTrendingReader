@@ -177,29 +177,6 @@ class ViewController: UIViewController {
         self.tableView.scrollToTop()
     }
     
-    fileprivate func changeColorView(view: UIView) {
-        view.subviews.forEach { (view) in
-            if view.subviews.count > 0 {
-                changeColorView(view: view)
-            }
-            switch view {
-            case is UILabel:
-                if let label = view as? UILabel {
-                    label.textColor = label.getModeTextColor()
-                    label.setNeedsDisplay()
-                }
-            case is UIImageView:
-                if let iv = view as? UIImageView {
-                    iv.tintColor = iv.getModeTextColor()
-                    iv.setNeedsDisplay()
-                }
-            default:
-                view.backgroundColor = view.getModeColor()
-                view.setNeedsDisplay()
-            }
-        }
-    }
-    
     fileprivate func enableDarkMode(bool: Bool) {
         UserDefaults.standard.set(!Constants.isDarkModeEnabled, forKey: Constants.UserDefault.darkMode)
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }

@@ -43,11 +43,6 @@ class NavigationController: UINavigationController, UINavigationControllerDelega
         navigationBar.prefersLargeTitles = true
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        log_start()
-    }
-    
     func clearNavigationBar() {
         navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationBar.shadowImage = UIImage()

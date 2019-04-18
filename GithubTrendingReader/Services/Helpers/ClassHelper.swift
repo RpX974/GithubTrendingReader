@@ -24,8 +24,6 @@ class ClassHelper {
         let barTintColor: UIColor = isDarkModeEnabled ? Colors.darkMode : .white
         let tintColor: UIColor = isDarkModeEnabled ? .white : Colors.darkMode
         let attrs = [NSAttributedString.Key.foregroundColor: tintColor]
-//        let largeAttrs = [NSAttributedString.Key.foregroundColor: tintColor,
-//                          NSAttributedString.Key.font: UIFont.bold(size: 30)]
         UINavigationBar.appearance().titleTextAttributes = attrs
         UINavigationBar.appearance().largeTitleTextAttributes = attrs
         UINavigationBar.appearance().tintColor = tintColor
@@ -42,45 +40,5 @@ class ClassHelper {
         DispatchQueue.main.async {
             parent.present(alert, animated: true)
         }
-    }
-    
-    static func changeColorView(view: UIView) {
-        view.subviews.forEach { (view) in
-            if view.subviews.count > 0 {
-                changeColorView(view: view)
-            }
-            switch view {
-            case is UILabel:
-                if let label = view as? UILabel {
-                    label.textColor = label.getModeTextColor()
-                    label.setNeedsDisplay()
-                }
-            case is UIImageView:
-                if let iv = view as? UIImageView {
-                    iv.tintColor = iv.getModeTextColor()
-                    iv.setNeedsDisplay()
-                }
-            default:
-                view.backgroundColor = view.getModeColor()
-                view.tintColor = view.getModeTextColor()
-                print("VIEW - \(view)\nCOLOR - \(view.getModeColor().description)")
-                view.setNeedsDisplay()
-            }
-        }
-    }
-
-    static func changeModeColor(isDarkModeEnabled: Bool, vc: UIViewController){
-        UserDefaults.standard.set(isDarkModeEnabled, forKey: Constants.UserDefault.darkMode)
-        ClassHelper.setupUIAppareance(isDarkModeEnabled: isDarkModeEnabled)
-        let view: UIView = vc.view
-        let windows = UIApplication.shared.windows
-        changeColorView(view: view)
-        for window in windows {
-            for view in window.subviews {
-                view.removeFromSuperview()
-                window.addSubview(view)
-            }
-        }
-        vc.setNeedsStatusBarAppearanceUpdate()
     }
 }
