@@ -52,6 +52,7 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         return self.globalDelegate?.setDataSource(self) as? [[Data]]
     }
     
+    fileprivate var defaultYOffset: CGFloat = 0.0
     weak var globalDelegate: CollectionViewProtocol?
     
     // MARK - Initializers
@@ -79,6 +80,11 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         self.alpha = alpha
         self.register(CellType.self, forCellWithReuseIdentifier: CellType.stringClass)
         self.addNoDataLabel(noDataText: noDataText, insets: noDataTextInsets)
+    }
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        defaultYOffset = yOffSet > 0.0 ? 0.0 : yOffSet
     }
     
     fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets){
@@ -156,5 +162,11 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         let visiblePoint = CGPoint(x: visibleRect.midX, y: visibleRect.midY)
         guard let visibleIndexPath: IndexPath = self.indexPathForItem(at: visiblePoint) else { return }
         globalDelegate?.scrollViewDidEndDecelerating(scrollView, currentIndex: visibleIndexPath.item)
+    }
+    
+    @objc override func scrollToTop(animated: Bool = true) {
+        DispatchQueue.main.async {
+            self.setContentOffset(.init(x: 0, y: self.defaultYOffset), animated: animated)
+        }
     }
 }

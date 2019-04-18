@@ -92,4 +92,8 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
     func prefixToAvoid() -> String {
         return PrivateConstants.prefixToAvoid
     }
+    
+    func scrollToTop(){
+        webView.scrollView.scrollToTop(animated: true)
+    }
 }

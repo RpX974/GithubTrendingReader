@@ -236,9 +236,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
                     log_info("Repos retrieved")
                     self.dataSource = data
                     fullfill(())
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        self.dataSource.forEach({ $0.setUrlString() })
-                    }
+                    self.dataSource.forEach({ $0.setUrlString() })
                 case .failure(let error):
                     reject(error)
                 }

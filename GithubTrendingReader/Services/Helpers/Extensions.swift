@@ -118,15 +118,15 @@ extension UIScrollView {
         }
     }
     
-    func scrollToTop(animated: Bool = false){
-        DispatchQueue.main.async {
-            self.setContentOffset(.zero, animated: animated)
-        }
+    @objc func scrollToTop(animated: Bool = false){
+        self.setContentOffset(.zero, animated: animated)
     }
 }
 
 // MARK: - UITableView
 extension UITableView {
+    override func scrollToTop(animated: Bool = false) {}
+
     func scrollToFirstItem(animated: Bool = true){
         guard self.visibleCells.count > 0 else { return }
         self.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
@@ -140,6 +140,8 @@ extension UITableView {
 
 // MARK: - UICollectionView
 extension UICollectionView {
+    override func scrollToTop(animated: Bool = false) {}
+
     func scrollToFirstItem(animated: Bool = true){
         guard self.visibleCells.count > 0 else { return }
         self.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
@@ -188,8 +190,18 @@ extension UIView {
 
 }
 
+extension Optional {
+    static var stringClass: String {
+        return "\(self)"
+    }
+}
+
 // MARK: - UIViewController
- extension UIViewController {
+ extension UIViewController {        
+    func stringClass() -> String {
+        return "\(self)"
+    }
+
     func addCornerRadius(radius: CGFloat) {
         self.view.layer.cornerRadius = radius
         self.view.clipsToBounds = true

@@ -96,30 +96,11 @@ class ViewController: UIViewController {
         initFakeWebView()
         viewModel.start()
     }
-    
-    
-    func getHeaderImageHeightForCurrentDevice() -> CGFloat {
-        switch UIScreen.main.nativeBounds.height {
-        case 2436: // iPhone X
-            return 175
-        default: // Every other iPhone
-            return 145
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
+        
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         segmentedControl.addShadow(radius: 5, opacity: 0.1)
         tableView.setScrollIndicatorColor(color: view.getModeTextColor())
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-//        navigationItem.hidesSearchBarWhenScrolling = true
     }
     
     fileprivate func setupUI(){
@@ -144,7 +125,6 @@ class ViewController: UIViewController {
                                         target: self,
                                         action: #selector(changeMode),
                                         tintColor: view.getModeTextColor())
-        navigationController?.navigationBar.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(scrollToTop)))
     }
     
     fileprivate func setupConstraints(){
@@ -194,7 +174,30 @@ class ViewController: UIViewController {
     }
     
     @objc fileprivate func scrollToTop(){
-        self.tableView.scrollToFirstItem()
+        self.tableView.scrollToTop()
+    }
+    
+    fileprivate func changeColorView(view: UIView) {
+        view.subviews.forEach { (view) in
+            if view.subviews.count > 0 {
+                changeColorView(view: view)
+            }
+            switch view {
+            case is UILabel:
+                if let label = view as? UILabel {
+                    label.textColor = label.getModeTextColor()
+                    label.setNeedsDisplay()
+                }
+            case is UIImageView:
+                if let iv = view as? UIImageView {
+                    iv.tintColor = iv.getModeTextColor()
+                    iv.setNeedsDisplay()
+                }
+            default:
+                view.backgroundColor = view.getModeColor()
+                view.setNeedsDisplay()
+            }
+        }
     }
     
     fileprivate func enableDarkMode(bool: Bool) {
@@ -202,7 +205,6 @@ class ViewController: UIViewController {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         appDelegate.switchMode()
     }
-    
 }
 
 // MARK: - Extension
@@ -245,12 +247,9 @@ extension ViewController: TableViewProtocol {
         }
     }
     
-    func tableViewDidScroll(_ tableView: UITableView) {
+    func tableViewDidScroll(_ tableView: UITableView, isScrollViewDown: Bool) {
         guard tableView == self.tableView else { return }
-        let yOffSet = tableView.contentOffset.y
-        if yOffSet < 0 { return }
-        let alpha: CGFloat = (yOffSet >= self.lastYOffSet && yOffSet > 0) ? 0 : 1
-        lastYOffSet = yOffSet
+        let alpha: CGFloat = isScrollViewDown ? 0 : 1
         guard segmentedControl.alpha != alpha else { return }
         Animator.animate(view: segmentedControl, alpha: alpha, completion: nil)
     }
@@ -305,16 +304,23 @@ extension ViewController: HomeProtocolDelegate {
     
     func reloadLanguagesTableView(){
         self.languagesTableView.reloadData()
-        self.languagesTableView.scrollToTop()
+        self.languagesTableView.scrollToTop(animated: false)
     }
     
     func updateLeftButtonBarTitle(languageName: String?, count: Int){
         self.title = languageName ?? "loading".localized
-//        self.title = PrivateConstants.titleFormat(string: languageName)
         showActivityIndicator(bool: false)
     }
     
     func showActivityIndicator(bool: Bool) {
         bool ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+    }
+}
+
+// MARK: - NavigationControllerDelegate
+
+extension ViewController {
+    override func setTapGestureAction() -> Selector? {
+        return #selector(scrollToTop)
     }
 }

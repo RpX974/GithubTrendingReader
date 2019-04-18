@@ -64,10 +64,6 @@ class DetailsViewController: UIViewController {
         setupNotificationCenter()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
@@ -99,6 +95,7 @@ class DetailsViewController: UIViewController {
         navigationItem.largeTitleDisplayMode = .automatic
         navigationItem.setRightBarButton(image: PrivateConstants.rightBarButtonImage, target: self, action: #selector(self.goToSafari), tintColor: view.getModeTextColor())
     }
+    
     
     fileprivate func setupConstraints(){
         collectionView.edgesToSuperview(usingSafeArea: true)
@@ -134,6 +131,13 @@ class DetailsViewController: UIViewController {
         viewModel.setCurrentIndex(index: index)
     }
     
+    @objc fileprivate func scrollToTop(){
+        guard let cell = self.collectionView.cellForItem(at: .init(item: viewModel.getCurrentIndex(), section: 0))
+        as? DetailsCollectionViewCell
+        else { return }
+        cell.scrollToTop()
+    }
+
     @objc fileprivate func goToSafari(){
         guard let repo = viewModel.getDataFromCurrentIndex(), let url = URL.init(string: repo.url) else { return }
         if UIApplication.shared.canOpenURL(url) {
@@ -190,5 +194,13 @@ extension DetailsViewController: DetailsViewProtocolDelegate {
 
     func updateTitle(title: String?) {
         self.title = title
+    }
+}
+
+// MARK: - NavigationControllerDelegate
+
+extension DetailsViewController {
+    override func setTapGestureAction() -> Selector? {
+        return #selector(scrollToTop)
     }
 }

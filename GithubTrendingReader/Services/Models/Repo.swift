@@ -45,21 +45,29 @@ class Repo: Codable {
     }
     
     func setUrlString(){
-        guard urlString == nil else {
-            log_error("urlString already exists")
-            return
+        DispatchQueue.global(qos: .userInitiated).async {
+            
+            guard self.urlString == nil else {
+                log_error("urlString already exists")
+                return
+            }
+            do {
+                guard let url = URL.init(string: self.url), let contents = try String(contentsOf: url, encoding: .utf8)
+                    .slice(from: Constants.HTML.sliceFrom, to: Constants.HTML.sliceTo)?
+                    .replacingOccurrences(of: String(format: Constants.HTML.replacingOf, self.author, self.name), with:
+                        String(format: Constants.HTML.replacingWith, Constants.github, self.author, self.name))
+                    else { return }
+                let style = Constants.isDarkModeEnabled ? Constants.CSS.darkMode : Constants.CSS.whiteMode
+                self.urlString = String(format: Constants.HTML.urlFormat, style, contents)
+            } catch let error {
+                log_error(error.localizedDescription)
+            }
         }
-        do {
-            guard let url = URL.init(string: url), let contents = try String(contentsOf: url, encoding: .utf8)
-                .slice(from: Constants.HTML.sliceFrom, to: Constants.HTML.sliceTo)?
-                .replacingOccurrences(of: String(format: Constants.HTML.replacingOf, author, name), with:
-                    String(format: Constants.HTML.replacingWith, Constants.github, author, name))
-                else { return }
-            let style = Constants.isDarkModeEnabled ? Constants.CSS.darkMode : Constants.CSS.whiteMode
-            self.urlString = String(format: Constants.HTML.urlFormat, style, contents)
-        } catch let error {
-            log_error(error.localizedDescription)
-        }
+    }
+    
+    func refreshUrlString(){
+        self.urlString = nil
+        setUrlString()
     }
     
     func getUrlString() -> String? {

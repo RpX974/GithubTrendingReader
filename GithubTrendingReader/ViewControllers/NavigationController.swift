@@ -8,9 +8,25 @@
 
 import UIKit
 
-class NavigationController: UINavigationController {
+protocol NavigationControllerDelegate: class {
+    func setTapGestureAction() -> Selector?
+}
+
+extension NavigationControllerDelegate {
+    func setTapGestureAction() -> Selector? { return nil }
+}
+
+extension UIViewController: NavigationControllerDelegate {
+    @objc func setTapGestureAction() -> Selector? { return nil }
+}
+
+class NavigationController: UINavigationController, UINavigationControllerDelegate {
     
     // MARK: - Properties
+    
+    fileprivate var tapGesture: UITapGestureRecognizer!
+    
+    weak var globalDelegate: NavigationControllerDelegate?
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return Constants.isDarkModeEnabled ? .lightContent : .default
@@ -21,14 +37,37 @@ class NavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        delegate = self
         view.backgroundColor = view.getModeColor()
         navigationBar.isTranslucent = false
         navigationBar.prefersLargeTitles = true
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        log_start()
     }
     
     func clearNavigationBar() {
         navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationBar.shadowImage = UIImage()
         self.view.backgroundColor = .clear
+    }
+    
+    func addTapGesture(target: UIViewController, action: Selector){
+        tapGesture = UITapGestureRecognizer.init(target: target, action: action)
+        navigationBar.addGestureRecognizer(tapGesture)
+    }
+    
+    func removeTapGesture(){
+        guard let tap = tapGesture else { return }
+        navigationBar.removeGestureRecognizer(tap)
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        globalDelegate = viewController
+        guard let action = self.globalDelegate?.setTapGestureAction() else { return }
+        removeTapGesture()
+        addTapGesture(target: viewController, action: action)
     }
 }

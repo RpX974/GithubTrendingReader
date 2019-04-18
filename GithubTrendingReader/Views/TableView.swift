@@ -18,7 +18,7 @@ protocol TableViewProtocol: class {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat?
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int)
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath, data: Decodable?)
-    func tableViewDidScroll(_ tableView: UITableView)
+    func tableViewDidScroll(_ tableView: UITableView, isScrollViewDown: Bool)
 }
 
 // MARK: - Protocol Optional Methods
@@ -29,7 +29,7 @@ extension TableViewProtocol {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat? { return nil }
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {}
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath, data: Decodable?) {}
-    func tableViewDidScroll(_ tableView: UITableView){}
+    func tableViewDidScroll(_ tableView: UITableView, isScrollViewDown: Bool) {}
 }
 
 // MARK: - GenericCell
@@ -68,7 +68,9 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     }
     
     fileprivate var enableHighlight: Bool?
-    
+    fileprivate var defaultYOffset: CGFloat = 0.0
+    fileprivate lazy var lastYOffset: CGFloat = self.defaultYOffset
+
     weak var globalDelegate: TableViewProtocol?
     
     // MARK: - Initializers
@@ -101,6 +103,12 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         self.enableHighlight = enableHighlight
         self.register(CellType.self, forCellReuseIdentifier: CellType.stringClass)
         self.addNoDataLabel(noDataText: noDataText, insets: noDataTextInsets)
+    }
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        defaultYOffset = yOffSet
+        print(defaultYOffset)
     }
     
     fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets){
@@ -193,6 +201,15 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     // MARK: - SCROLLVIEW
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.globalDelegate?.tableViewDidScroll(self)
+        if yOffSet < defaultYOffset || yOffSet == lastYOffset { return }
+        let isScrollingDown: Bool = yOffSet < lastYOffset ? false : true
+        lastYOffset = yOffSet
+        self.globalDelegate?.tableViewDidScroll(self, isScrollViewDown: isScrollingDown)
+    }
+    
+    @objc override func scrollToTop(animated: Bool = true) {
+        DispatchQueue.main.async {
+            self.setContentOffset(.init(x: 0, y: self.defaultYOffset), animated: animated)
+        }
     }
 }
