@@ -103,7 +103,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc fileprivate func scrollToTop(){
+    @objc func scrollToTop(){
         self.tableView.scrollToTop()
     }
 

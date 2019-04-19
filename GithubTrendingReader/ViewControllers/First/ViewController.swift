@@ -146,6 +146,11 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
     
     // MARK: - Custom Functions
     
+    @objc override func scrollToTop() {
+        super.scrollToTop()
+        Animator.animate(view: segmentedControl, alpha: 1, completion: nil)
+    }
+    
     @objc fileprivate func showFavorites(){
         let viewModel = self.viewModel.getFavoritesViewModel()
         let vc = FavoritesViewController<RepoTableViewCell, FavoritesViewModel<Repo>>(viewModel: viewModel)
