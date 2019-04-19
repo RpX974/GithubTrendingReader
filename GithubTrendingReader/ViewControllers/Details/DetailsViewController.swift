@@ -49,7 +49,6 @@ class DetailsViewController: UIViewController {
     }()
     
     fileprivate lazy var favoriteButton: UIBarButtonItem = {
-        let test = UIButton.init(type: UIButton.ButtonType.system)
         let b = UIBarButtonItem.init(image: "favorite".image, style: .plain, target: self, action: #selector(self.addToFavorite))
         return b
     }()
