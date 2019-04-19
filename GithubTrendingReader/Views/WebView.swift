@@ -28,6 +28,12 @@ extension WebViewProtocolDelegate {
 
 class WebView: UIWebView {
     
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+
     // MARK: - Properties
 
     weak var globalDelegate: WebViewProtocolDelegate?
@@ -60,10 +66,12 @@ class WebView: UIWebView {
 
 extension WebView: UIWebViewDelegate {
     
+    func webViewDidFinishLoad(_ webView: UIWebView) {
+        log_done()
+    }
+    
     func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
-        log_start()
         if navigationType == .linkClicked {
-            log_info("link Clicked")
             if let url = request.url {
                 var showImage = false
                 let imageFormats = self.globalDelegate?.setImageFormats()

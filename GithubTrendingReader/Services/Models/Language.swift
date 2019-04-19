@@ -18,15 +18,15 @@ struct Language: Codable {
 
 // MARK: - All
 
-class All: Codable {
+struct All: Codable {
     // MARK: - Properties
 
     let urlParam, name: String
     
     // MARK - Initializers
 
-    init(urlParam:String, name:String) {
-        self.name = name
+    init(urlParam: String, name: String) {
         self.urlParam = urlParam
+        self.name = name
     }
 }

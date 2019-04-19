@@ -18,6 +18,12 @@ protocol SegmentedControlDelegate: class {
 
 class SegmentedControl: UISegmentedControl {
     
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+
     // MARK: - Properties
 
     weak var delegate: SegmentedControlDelegate?

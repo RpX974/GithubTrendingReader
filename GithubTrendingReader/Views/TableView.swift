@@ -18,7 +18,8 @@ protocol TableViewProtocol: class {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat?
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int)
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath, data: Decodable?)
-    func tableViewDidScroll(_ tableView: UITableView, isScrollViewDown: Bool)
+    func tableViewDidScroll(_ scrollView: UIScrollView, isScrollViewDown: Bool)
+    func tableViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>, isScrollingDown: Bool)
 }
 
 // MARK: - Protocol Optional Methods
@@ -29,7 +30,8 @@ extension TableViewProtocol {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat? { return nil }
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {}
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath, data: Decodable?) {}
-    func tableViewDidScroll(_ tableView: UITableView, isScrollViewDown: Bool) {}
+    func tableViewDidScroll(_ scrollView: UIScrollView, isScrollViewDown: Bool) {}
+    func tableViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>, isScrollingDown: Bool) {}
 }
 
 // MARK: - GenericCell
@@ -41,10 +43,16 @@ protocol GenericTableViewCellProtocol {
 
 class GenericTableViewCell<Data: Decodable>: UITableViewCell, GenericTableViewCellProtocol {
     func configure(with data: Data?) {}
-    //    func configure(with data: Data?){}
 }
 
 class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableView, UITableViewDelegate, UITableViewDataSource {
+
+    // MARK: - Deinit
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        log_done()
+    }
     
     // MARK: - Views
 
@@ -52,6 +60,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         let label = UILabel()
         label.font = .bold(size: 20)
         label.textAlignment = .left
+        label.textColor = getModeTextColor()
         label.isHidden = true
         label.numberOfLines = 0
         return label
@@ -66,10 +75,24 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     fileprivate var titleHeaders: [String]? {
         return self.globalDelegate?.setTitleHeaders(self)
     }
-    
-    fileprivate var enableHighlight: Bool?
-    fileprivate var defaultYOffset: CGFloat = 0.0
+
+    fileprivate var defaultYOffset: CGFloat {
+        if UIDevice.current.orientation.isPortrait, let portraitYOffset = portraitYOffset {
+            return portraitYOffset
+        } else if let landscapeYOffset = landscapeYOffset {
+            return landscapeYOffset
+        }
+        return 0
+    }
+
+    fileprivate var portraitYOffset: CGFloat?
+    fileprivate var landscapeYOffset: CGFloat?
+
     fileprivate lazy var lastYOffset: CGFloat = self.defaultYOffset
+    fileprivate lazy var currentOrientation: UIDeviceOrientation = .portrait
+
+    fileprivate var enableHighlight: Bool?
+    var isUpdateScrollViewEnabled = true
 
     weak var globalDelegate: TableViewProtocol?
     
@@ -103,12 +126,17 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         self.enableHighlight = enableHighlight
         self.register(CellType.self, forCellReuseIdentifier: CellType.stringClass)
         self.addNoDataLabel(noDataText: noDataText, insets: noDataTextInsets)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-        defaultYOffset = yOffSet
-        print(defaultYOffset)
+        switch UIDevice.current.orientation {
+        case .portrait:
+            if portraitYOffset == nil { portraitYOffset = yOffSet }
+        default:
+            if landscapeYOffset == nil { landscapeYOffset = yOffSet }
+        }
     }
     
     fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets){
@@ -121,6 +149,10 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     }
     
     // MARK: - Custom Functions
+    
+    @objc fileprivate func orientationChanged() {
+        currentOrientation = UIDevice.current.orientation
+    }
     
     func register(cellClasses: [UITableViewCell.Type]){
         cellClasses.forEach({self.register($0.self, forCellReuseIdentifier: $0.stringClass)})
@@ -155,8 +187,8 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CellType.stringClass, for: indexPath) as? CellType
             else { return CellType() }
         let data = getData(with: indexPath)
+        cell.configure(with: data)
         guard let overrideCell = self.globalDelegate?.tableView(tableView, cellForRowAt: indexPath, cell: cell, data: data) else {
-            cell.configure(with: data)
             return cell
         }
         return overrideCell
@@ -199,15 +231,33 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     }
     
     // MARK: - SCROLLVIEW
+
     
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        
+        if scrollView.contentOffset.y <= defaultYOffset || targetContentOffset.pointee.y < scrollView.contentOffset.y {
+            // move up
+            self.globalDelegate?.tableViewWillEndDragging(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset, isScrollingDown: false)
+        } else {
+            // move down
+            self.globalDelegate?.tableViewWillEndDragging(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset, isScrollingDown: true)
+        }
+    }
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if yOffSet < defaultYOffset || yOffSet == lastYOffset { return }
-        let isScrollingDown: Bool = yOffSet < lastYOffset ? false : true
-        lastYOffset = yOffSet
-        self.globalDelegate?.tableViewDidScroll(self, isScrollViewDown: isScrollingDown)
+        
+        if lastYOffset > scrollView.contentOffset.y && lastYOffset < scrollView.contentSize.height - scrollView.frame.height {
+            // move up
+            self.globalDelegate?.tableViewDidScroll(scrollView, isScrollViewDown: false)
+        } else if lastYOffset < scrollView.contentOffset.y && scrollView.contentOffset.y > 0 {
+            // move down
+            self.globalDelegate?.tableViewDidScroll(scrollView, isScrollViewDown: true)
+        }
+        lastYOffset = scrollView.contentOffset.y
     }
     
     @objc override func scrollToTop(animated: Bool = true) {
+        log_info("TableView scolled to top")
         DispatchQueue.main.async {
             self.setContentOffset(.init(x: 0, y: self.defaultYOffset), animated: animated)
         }

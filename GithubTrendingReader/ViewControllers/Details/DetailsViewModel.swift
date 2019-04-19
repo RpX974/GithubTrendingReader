@@ -8,7 +8,13 @@
 
 import Foundation
 
-class DetailsViewViewModel: GenericDataSourceViewModel<Repo> {
+class DetailsViewModel: GenericDataSourceViewModel<Repo> {
+    
+    // MARK: - Deinit
+
+    deinit {
+        log_done()
+    }
     
     // MARK: - Properties
     
@@ -19,6 +25,8 @@ class DetailsViewViewModel: GenericDataSourceViewModel<Repo> {
         }
     }
 
+    var favorites = [Repo]()
+    
     weak var delegate: DetailsViewProtocolDelegate?
     
     // MARK: - Initializers
@@ -29,10 +37,7 @@ class DetailsViewViewModel: GenericDataSourceViewModel<Repo> {
     }
     
     // MARK: - Custom Functions
-    
-    func getCurrentIndex() -> Int {
-        return currentIndex
-    }
+    // MARK: - SETTER
 
     func setCurrentIndex(index: Int){
         currentIndex = index
@@ -43,11 +48,18 @@ class DetailsViewViewModel: GenericDataSourceViewModel<Repo> {
         dataSource.append(contentsOf: data)
     }
     
+    // MARK: - GETTER
+
+    func getCurrentIndex() -> Int {
+        return currentIndex
+    }
+    
     func getDataFromCurrentIndex() -> Repo?{
         return getDataFrom(index: currentIndex)
     }
     
-    func getCollectionViewDataSource() -> [[Repo]?]?{
-        return [dataSource]
+    func isFavorite() -> Bool {
+        guard let data = getDataFromCurrentIndex() else { return false }
+        return favorites.contains(where: { $0.urlString == data.urlString})
     }
 }

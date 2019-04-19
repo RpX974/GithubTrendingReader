@@ -47,7 +47,7 @@ class API {
         }
     }
 
-    func retrieveData<T: Codable>(with url: URL, completion: @escaping ResultCompletion<T>){
+    func retrieveData<T: Decodable>(with url: URL, completion: @escaping ResultCompletion<T>){
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
                 completion(.failure(error))
@@ -66,7 +66,7 @@ class API {
         }.resume()
     }
     
-    func getTrending<T: Codable>(fromLanguage language: String, since: Since, completion: @escaping ResultCompletion<T>){
+    func getTrending<T: Decodable>(fromLanguage language: String, since: Since, completion: @escaping ResultCompletion<T>){
         let urlString = self.getUrlString(from: language, since: since)
         guard let url = URL.init(string: urlString) else {
             log_error(ERROR.urlFailed.localizedDescription)
@@ -75,7 +75,7 @@ class API {
         self.retrieveData(with: url, completion: completion)
     }
     
-    func getAllLanguages<T: Codable>(completion: @escaping ResultCompletion<T>){
+    func getAllLanguages<T: Decodable>(completion: @escaping ResultCompletion<T>){
         let urlString = Constants.languageURL
         guard let url = URL.init(string: urlString) else {
             log_error(ERROR.urlFailed.localizedDescription)

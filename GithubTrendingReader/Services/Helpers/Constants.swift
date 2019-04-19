@@ -31,6 +31,8 @@ struct Constants {
     struct UserDefault {
         static let darkMode: String = "darkMode"
         static let language: String = "language"
+        static let favorites: String = "favorites"
+        static let recents: String = "recents"
         static let since: String = "since"
         static let swipe: String = "swipe"
     }

@@ -11,6 +11,12 @@ import UIKit
 
 class LanguageTableViewCell: GenericTableViewCell<All> {
     
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+    
     // MARK: - Views
 
     let separator: UIView = {

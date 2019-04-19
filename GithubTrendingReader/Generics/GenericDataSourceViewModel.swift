@@ -8,7 +8,7 @@
 
 import Foundation
 
-class GenericDataSourceViewModel<T: Decodable> {
+class GenericDataSourceViewModel<Data: Codable> {
     
     // MARK: - Deinit
 
@@ -19,20 +19,31 @@ class GenericDataSourceViewModel<T: Decodable> {
     // MARK: - Properties
 
     var qosClass: DispatchQoS.QoSClass = .userInitiated
-    var dataSource = [T]()
-    
-    // MARK: - Custom Functions
+    var dataSource = [Data]()
+    var numberOfItems: Int { return dataSource.count }
 
-    var numberOfItems: Int {
-        return dataSource.count
+    // MARK: - Custom Functions
+    // MARK: - GETTER
+
+    func getDataSource() -> [Data] {
+        return dataSource
     }
     
-    func getDataFrom(indexPath: IndexPath) -> T? {
+    func getListDataSource() -> [[Data]?] {
+        return [dataSource]
+    }
+    
+    func getDataFrom(indexPath: IndexPath) -> Data? {
         let index = indexPath.row
         return index < dataSource.count ? dataSource[index] : nil
     }
     
-    func getDataFrom(index: Int) -> T? {
+    func getDataFrom(index: Int) -> Data? {
         return index < dataSource.count ? dataSource[index] : nil
     }
+    
+    func getGenericViewModel() -> GenericDataSourceViewModel<Data>? {
+        return self
+    }
+    
 }

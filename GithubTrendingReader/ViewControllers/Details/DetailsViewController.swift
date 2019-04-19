@@ -22,9 +22,15 @@ class DetailsViewController: UIViewController {
     // MARK: - Constants
 
     struct PrivateConstants {
-        static let rightBarButtonImage: UIImage? = "web".image
         static let alertTitle: String = "swipe_title".localized
         static let alertMessage: String = "swipe_message".localized
+        static let darkModeEnabledImage: UIImage? = "moon".image
+        static let darkModeDisabledImage: UIImage? = "moonFull".image
+        static let rightBarButtonImage: UIImage? = "web".image
+        static var leftBarButtonImage: UIImage? {
+            return (Constants.isDarkModeEnabled ? PrivateConstants.darkModeEnabledImage : PrivateConstants.darkModeDisabledImage)
+        }
+
     }
     
     // MARK: - Views
@@ -42,10 +48,17 @@ class DetailsViewController: UIViewController {
         return collectionView
     }()
     
+    fileprivate lazy var favoriteButton: UIBarButtonItem = {
+        let test = UIButton.init(type: UIButton.ButtonType.system)
+        let b = UIBarButtonItem.init(image: "favorite".image, style: .plain, target: self, action: #selector(self.addToFavorite))
+        return b
+    }()
+    
     // MARK: - Properties
 
-    fileprivate lazy var viewModel = DetailsViewViewModel(delegate: self)
     fileprivate var first = true
+    fileprivate lazy var viewModel = DetailsViewModel(delegate: self)
+    fileprivate var favoritesViewModel: FavoritesViewModel<Repo>!
     
     // MARK - Closures
     
@@ -53,6 +66,15 @@ class DetailsViewController: UIViewController {
     var showWebImage: ((String) -> Void)?
 
     // MARK: - View Configuration
+    
+    convenience init(favoritesViewModel: FavoritesViewModel<Repo>, repos: Repos, index: Int, scrollToIndex: ((Int) -> Void)?) {
+        self.init()
+        log_start()
+        self.favoritesViewModel = favoritesViewModel
+        self.viewModel.setDataSource(data: repos)
+        self.viewModel.setCurrentIndex(index: index)
+        self.scrollToIndex = scrollToIndex
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,7 +89,6 @@ class DetailsViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
-        self.updateTitle(title: self.title)
     }
     
     override func viewDidLayoutSubviews() {
@@ -92,10 +113,12 @@ class DetailsViewController: UIViewController {
     }
     
     fileprivate func setupNavigationBar(){
-        navigationItem.largeTitleDisplayMode = .automatic
-        navigationItem.setRightBarButton(image: PrivateConstants.rightBarButtonImage, target: self, action: #selector(self.goToSafari), tintColor: view.getModeTextColor())
+        navigationItem.setRightBarButton(image: PrivateConstants.rightBarButtonImage,
+                                         target: self,
+                                         action: #selector(self.goToSafari),
+                                         tintColor: view.getModeTextColor())
+        navigationItem.rightBarButtonItems?.append(favoriteButton)
     }
-    
     
     fileprivate func setupConstraints(){
         collectionView.edgesToSuperview(usingSafeArea: true)
@@ -110,6 +133,7 @@ class DetailsViewController: UIViewController {
             DispatchQueue.main.async {
                 self.present(viewer, animated: true, completion: nil)
             }
+            log_info("Web image tapped and currently displayed")
         }
     }
     
@@ -122,20 +146,17 @@ class DetailsViewController: UIViewController {
         ClassHelper.showAlertView(parent: self, title: PrivateConstants.alertTitle, message: PrivateConstants.alertMessage, tintColor: Colors.darkMode, handlerAction: { _ in
             UserDefaults.standard.set(true, forKey: Constants.UserDefault.swipe)
         })
+        log_info("Swipe alert is currently displayed")
     }
     
     // MARK: - Custom Functions
-
-    func setRepos(repos: Repos, index: Int){
-        viewModel.setDataSource(data: repos)
-        viewModel.setCurrentIndex(index: index)
-    }
     
     @objc fileprivate func scrollToTop(){
         guard let cell = self.collectionView.cellForItem(at: .init(item: viewModel.getCurrentIndex(), section: 0))
         as? DetailsCollectionViewCell
         else { return }
         cell.scrollToTop()
+        
     }
 
     @objc fileprivate func goToSafari(){
@@ -145,12 +166,18 @@ class DetailsViewController: UIViewController {
         }
     }
     
+    @objc fileprivate func addToFavorite(){
+        let isFavorite = favoritesViewModel.addFavorite(repo: viewModel.getDataFromCurrentIndex())
+        updateFavoriteImage(isFavorite: isFavorite)
+    }
+    
     @objc fileprivate func orientationChanged() {
         // handle rotation here
         collectionView.collectionViewLayout.invalidateLayout()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.collectionView.scrollToItem(indexPath: .init(item: self.viewModel.getCurrentIndex(), section: 0), animated: false)
         }
+        log_info("Orientation changed to \(UIDevice.current.orientation.isPortrait ? "Portrait" : "Landscape")")
     }
     
     fileprivate func setScrollIndicatorColor(color: UIColor) {
@@ -170,11 +197,11 @@ class DetailsViewController: UIViewController {
 extension DetailsViewController: CollectionViewProtocol {
     
     func setDataSource(_ collectionView: UICollectionView) -> [[Decodable]?]? {
-        return viewModel.getCollectionViewDataSource()
+        return viewModel.getListDataSource()
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell {
-        guard let newCell = cell as? DetailsCollectionViewCell, let data = data as? Repo else { return cell }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell? {
+        guard let newCell = cell as? DetailsCollectionViewCell, let data = data as? Repo else { return nil }
         newCell.configureCell(data: data, showWebImage: showWebImage)
         return cell
     }
@@ -194,6 +221,14 @@ extension DetailsViewController: DetailsViewProtocolDelegate {
 
     func updateTitle(title: String?) {
         self.title = title
+        let isFavorite = favoritesViewModel.checkIfFavoriteExists(repo: viewModel.getDataFromCurrentIndex())
+        self.updateFavoriteImage(isFavorite: isFavorite)
+        log_info("Title updated to \(title ?? "No Title")")
+    }
+    
+    func updateFavoriteImage(isFavorite: Bool){
+        self.favoriteButton.image = isFavorite ? "favorite_full".image : "favorite".image
+        log_info("Repo is \(isFavorite ? "" : "not ")in Favorite")
     }
 }
 

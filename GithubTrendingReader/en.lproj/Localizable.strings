@@ -13,7 +13,9 @@
 "weekly"="Weekly";
 "monthly"="Monthly";
 "build_by"="Build by";
-"no_repo"="No repository available";
+"no_repo"="Trending repositories results are currently being dissected.";
+"favorites" = "Favorites";
+"no_favorites"="There is no repository in favorite";
 
 //STRING FORMAT
 "results"="Results (%d)";

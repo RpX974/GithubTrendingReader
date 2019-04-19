@@ -23,3 +23,16 @@ enum Since: String {
     case weekly = "weekly"
     case monthly = "monthly"
 }
+
+// MARK: - TableViewType
+
+enum TableViewType {
+    case repo, languages
+}
+
+// MARK: - LanguagesType
+
+enum LanguagesType {
+    case recents, popular, all
+}
+

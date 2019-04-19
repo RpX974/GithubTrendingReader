@@ -352,3 +352,57 @@ extension UINavigationItem {
     }
 }
 
+// MARK: - Codable
+
+extension Encodable {
+        
+    func save(forKey key: String) {
+        guard let data = try? JSONEncoder().encode(self) else { return }
+        UserDefaults.standard.set(data, forKey: key)
+    }
+    
+    func saveArray(forKey key: String) {
+        guard let data = self as? [Encodable] else { return }
+        let map = data.compactMap({ try? $0.data() })
+        UserDefaults.standard.set(map, forKey: key)
+    }
+
+    func data(using encoder: JSONEncoder = JSONEncoder()) throws -> Data {
+        return try encoder.encode(self)
+    }
+    
+    func string(using encoder: JSONEncoder = JSONEncoder()) throws -> String {
+        return try String(data: encoder.encode(self), encoding: .utf8)!
+    }
+}
+
+extension Decodable {
+    static func retrieve(forKey key: String) -> Self? {
+        guard let data = UserDefaults.standard.object(forKey: key) as? Data else { return nil }
+        let result = try? JSONDecoder().decode(Self.self, from: data)
+        return result
+    }
+    
+    static func retrieveArray(forKey key: String) -> [Self]? {
+        guard let data = UserDefaults.standard.object(forKey: key) as? [Data] else { return nil }
+        let result = data.compactMap({ try? JSONDecoder().decode(Self.self, from: $0) })
+        return result
+    }
+}
+
+// MARK: - UIScreen
+
+extension UIScreen {
+    
+    enum SizeType: CGFloat {
+        case Unknown = 0.0
+        case iPhone4 = 960.0
+        case iPhone5 = 1136.0
+    }
+    
+    var sizeType: SizeType {
+        let height = nativeBounds.height
+        guard let sizeType = SizeType(rawValue: height) else { return .Unknown }
+        return sizeType
+    }
+}

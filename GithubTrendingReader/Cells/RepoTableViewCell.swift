@@ -12,6 +12,14 @@ import SDWebImage
 
 class RepoTableViewCell: GenericTableViewCell<Repo> {
     
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+    
+    // MARK: - Constants
+
     struct PrivateConstants {
         static let contentInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16.0)
         static let circleSize: CGFloat = 15
@@ -22,10 +30,6 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
             static let star: UIImage? = "star".image
             static let fork: UIImage? = "fork".image
         }
-    }
-    
-    deinit {
-        log_done()
     }
     
     // MARK: - Properties
@@ -259,20 +263,5 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
                 iv.sd_setImage(with: url, placeholderImage: nil, options: [SDWebImageOptions.scaleDownLargeImages, SDWebImageOptions.highPriority], completed: nil)
             }
         }
-    }
-}
-
-extension UIScreen {
-    
-    enum SizeType: CGFloat {
-        case Unknown = 0.0
-        case iPhone4 = 960.0
-        case iPhone5 = 1136.0
-    }
-    
-    var sizeType: SizeType {
-        let height = nativeBounds.height
-        guard let sizeType = SizeType(rawValue: height) else { return .Unknown }
-        return sizeType
     }
 }

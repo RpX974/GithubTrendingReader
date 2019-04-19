@@ -9,35 +9,40 @@
 import UIKit
 import TinyConstraints
 
-class ViewController: UIViewController {
+// MARK: - Constants
 
+struct HomeConstants {
+    static let titleToSet: String = "loading".localized
+    static let noDataText: String = "no_data".localized
+    static let cellSize: CGFloat = 80.0
+    static let segmentedControlItems: [String] = ["daily".localized, "weekly".localized, "monthly".localized]
+    static let darkModeEnabledImage: UIImage? = "moon".image
+    static let darkModeDisabledImage: UIImage? = "moonFull".image
+    static let rightBarButtonImage: UIImage? = "favorite_full".image
+    static var leftBarButtonImage: UIImage? {
+        return (Constants.isDarkModeEnabled ? HomeConstants.darkModeEnabledImage : HomeConstants.darkModeDisabledImage)
+    }
+    
+    static func titleFormat(string: String?) -> String { return string != nil ? String(format: "trending_format".localized, string ?? "", "trending".localized) : "loading".localized }
+}
+
+// MARK: - ViewController
+
+class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewModel>: GenericControllerWithTableView<Repo, Cell, ViewModel> {
+    
     // MARK: - Deinit
-
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
         log_done()
     }
     
-    // MARK: - Constants
-    
-    struct PrivateConstants {
-        static let cellSize: CGFloat = 80.0
-        static let segmentedControlItems: [String] = ["daily".localized, "weekly".localized, "monthly".localized]
-        static let darkModeEnabledImage: UIImage? = "moon".image
-        static let darkModeDisabledImage: UIImage? = "moonFull".image
-        static var leftBarButtonImage: UIImage? {
-            return (Constants.isDarkModeEnabled ? PrivateConstants.darkModeEnabledImage : PrivateConstants.darkModeDisabledImage)
-        }
-        
-        static func titleFormat(string: String?) -> String { return string != nil ? String(format: "trending_format".localized, string ?? "", "trending".localized) : "loading".localized }
-    }
-    
     // MARK: - Views
     
     fileprivate var webView: UIWebView!
-
+    
     fileprivate lazy var segmentedControl: SegmentedControl = {
-        let sc = SegmentedControl.init(items: PrivateConstants.segmentedControlItems, backgroundColor: view.getModeColor(), tintColor: view.getModeTextColor(), textAttributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14, weight: .semibold)], selectedIndex: viewModel.getCurrentSince())
+        let sc = SegmentedControl.init(items: HomeConstants.segmentedControlItems, backgroundColor: view.getModeColor(), tintColor: view.getModeTextColor(), textAttributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14, weight: .semibold)], selectedIndex: viewModel.getCurrentSince())
         sc.delegate = self
         return sc
     }()
@@ -46,20 +51,11 @@ class ViewController: UIViewController {
         search.globalDelegate = self
         return search
     }()
-    fileprivate lazy var tableView: TableView<Repo, RepoTableViewCell> = {
-        let tableView = TableView<Repo, RepoTableViewCell>(backgroundColor: view.getModeColor(),
-                                  estimateRowHeight: 60.0,
-                                  contentInset: .init(top: segmentedControl.height + 20.0, left: 0, bottom: 10, right: 0),
-                                  enableHighlight: true,
-                                  noDataText: "no_repo".localized)
-        tableView.globalDelegate = self
-        return tableView
-    }()
     fileprivate lazy var languagesTableView: TableView<All, LanguageTableViewCell> = {
         let tableView = TableView<All, LanguageTableViewCell>(backgroundColor: view.getModeColor(),
-                                 estimateRowHeight: 44.0,
-                                 sectionHeaderHeight: 44.0,
-                                 alpha: 0.0)
+                                                              estimateRowHeight: 44.0,
+                                                              sectionHeaderHeight: 44.0,
+                                                              alpha: 0.0)
         tableView.globalDelegate = self
         return tableView
     }()
@@ -70,80 +66,74 @@ class ViewController: UIViewController {
     }()
     
     // MARK: - Properties
-
-    fileprivate var lastYOffSet: CGFloat = 0.0
     
-    fileprivate lazy var viewModel = HomeViewModel.init(delegate: self)
-
+    override var titleToSet: String? { return HomeConstants.titleToSet }
+    override var noDataText: String? { return HomeConstants.noDataText }
+    override var contentInset: UIEdgeInsets {
+        return .init(top: segmentedControl.height + 20.0,
+                     left: 0,
+                     bottom: 10,
+                     right: 0)
+    }
+    
     // MARK: - Constraints
-
+    
     fileprivate var bottomLanguagesTableViewConstraint: Constraint?
     fileprivate var topSegmentedControlConstraint: Constraint?
-
-    // MARK - Closures
-
-    fileprivate var scrollToIndex: ((Int) -> Void)!
-
-    // MARK: - View Configuration
-
+    
+    // MARK - Initializers
+    
+    convenience init(firstInit: Bool?) {
+        let viewModel = ViewModel()
+        self.init(viewModel: viewModel)
+        viewModel.setDelegate(delegate: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupUI()
-        setupConstraints()
+        log_start()
+        setupNavigationBar()
         setupNotificationKeyboard()
-        setScrollToIndex()
         initFakeWebView()
         viewModel.start()
     }
-        
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         segmentedControl.addShadow(radius: 5, opacity: 0.1)
-        tableView.setScrollIndicatorColor(color: view.getModeTextColor())
     }
     
-    fileprivate func setupUI(){
-        extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = view.getModeColor()
-        view.clipsToBounds = true
-        addAllSubviews()
-        setupNavigationBar()
-    }
-    
-    fileprivate func addAllSubviews(){
-        view.addSubview(tableView)
+    override func addAllSubviews() {
+        super.addAllSubviews()
+        view.addSubview(languagesTableView)
         view.addSubview(segmentedControl)
         view.addSubview(languagesTableView)
     }
     
     fileprivate func setupNavigationBar(){
-        navigationItem.largeTitleDisplayMode = .automatic
         navigationItem.addSearchController(search)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicator)
-        navigationItem.setLeftBarButton(image: PrivateConstants.leftBarButtonImage,
+        navigationItem.setLeftBarButton(image: HomeConstants.leftBarButtonImage,
                                         target: self,
                                         action: #selector(changeMode),
                                         tintColor: view.getModeTextColor())
+        navigationItem.setRightBarButton(image: HomeConstants.rightBarButtonImage,
+                                         target: self,
+                                         action: #selector(showFavorites),
+                                         tintColor: view.getModeTextColor())
+        navigationItem.rightBarButtonItems?.append(UIBarButtonItem(customView: activityIndicator))
     }
     
-    fileprivate func setupConstraints(){
+    override func setupConstraints() {
+        super.setupConstraints()
         segmentedControl.edgesToSuperview(excluding: [.top, .bottom], insets: .init(top: 0, left: 16, bottom: 0, right: 16), usingSafeArea: true)
         topSegmentedControlConstraint = segmentedControl.topToSuperview(offset: 16.0, usingSafeArea: true)
-        tableView.edgesToSuperview(excluding: .none, usingSafeArea: false)
         languagesTableView.edgesToSuperview(excluding: .bottom, usingSafeArea: true)
         bottomLanguagesTableViewConstraint = languagesTableView.bottomToSuperview()
     }
     
     fileprivate func setupNotificationKeyboard(){
-        NotificationCenter.default.addObserver(self, selector: #selector(didReceiveKeyboardNotificationObserver(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-    }
-    
-    fileprivate func setScrollToIndex(){
-        scrollToIndex = { [weak self] index in
-            guard let `self` = self else { return }
-            self.tableView.scrollToRow(at: IndexPath.init(item: index, section: 0), at: .bottom, animated: true)
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(didReceiveKeyboardNotificationObserver(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
     fileprivate func initFakeWebView() {
@@ -156,86 +146,91 @@ class ViewController: UIViewController {
     
     // MARK: - Custom Functions
     
-    fileprivate func showDetails(index: Int){
-        let vc = DetailsViewController()
-        vc.scrollToIndex = self.scrollToIndex
-        vc.setRepos(repos: viewModel.dataSource, index: index)
+    @objc fileprivate func showFavorites(){
+        let viewModel = self.viewModel.getFavoritesViewModel()
+        let vc = FavoritesViewController<RepoTableViewCell, FavoritesViewModel<Repo>>(viewModel: viewModel)
         self.navigationController?.pushViewController(vc, animated: true)
+        log_info("Pushing to FavoritesViewController")
     }
-
+    
     @objc fileprivate func didReceiveKeyboardNotificationObserver(_ notification: Notification) {
         let userInfo = notification.userInfo
         let keyboardFrame = (userInfo!["UIKeyboardFrameEndUserInfoKey"] as! NSValue).cgRectValue
-        self.bottomLanguagesTableViewConstraint?.constant = -(self.view.height - keyboardFrame.origin.y)
+        self.bottomLanguagesTableViewConstraint?.constant = -keyboardFrame.size.height
     }
     
     @objc fileprivate func changeMode(){
         self.enableDarkMode(bool: !Constants.isDarkModeEnabled)
     }
     
-    @objc fileprivate func scrollToTop(){
-        self.tableView.scrollToTop()
+    fileprivate func enableDarkMode(bool: Bool) {
+        ClassHelper.changeModeColor(isDarkModeEnabled: bool, vc: self)
+        activityIndicator.color = view.getModeTextColor()
+        navigationItem.rightBarButtonItem?.tintColor = view.getModeTextColor()
+        navigationItem.leftBarButtonItem?.tintColor = view.getModeTextColor()
+        navigationItem.leftBarButtonItem?.image = HomeConstants.leftBarButtonImage
+        viewModel.dataSource.forEach{ $0.refreshUrlString() }
+        viewModel.getFavoritesViewModel().refreshUrl()
+        if let indexs = tableView.indexPathsForVisibleRows {
+            tableView.reloadRows(at: indexs, with: .none)
+        }
+        log_info("DarkMode is \(bool ? "enabled" : "disabled")")
     }
     
-    fileprivate func enableDarkMode(bool: Bool) {
-        UserDefaults.standard.set(!Constants.isDarkModeEnabled, forKey: Constants.UserDefault.darkMode)
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.switchMode()
+    // MARK: - Delegate
+    // MARK: - TableView
+    
+    override func setDataSource(_ tableView: UITableView) -> [[Decodable]?]? {
+        return viewModel.getTableViewDataSource(type: getTableViewType(tableView))
     }
-}
-
-// MARK: - Extension
-// MARK: - TableView
-
-extension ViewController: TableViewProtocol {
-
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath, data: Decodable?) {
+        switch getTableViewType(tableView) {
+        case .languages:
+            log_info("Cell tapped at \(indexPath) from LanguagesTableView")
+            viewModel.updateTrending(data: data, indexPath: indexPath)
+            search.isActive = false
+        default:
+            log_info("Cell tapped at \(indexPath) from defaultTableView")
+            showDetails(index: indexPath.item)
+        }
+    }
+    
     func getTableViewType(_ tableView: UITableView) -> TableViewType {
         return tableView == languagesTableView ? .languages : .repo
     }
     
-    func setDataSource(_ tableView: UITableView) -> [[Decodable]?]? {
-        return viewModel.getTableViewDataSource(type: getTableViewType(tableView))
-    }
     
-    func setTitleHeaders(_ tableView: UITableView) -> [String]? {
+    override func setTitleHeaders(_ tableView: UITableView) -> [String]? {
         return viewModel.getTitleHeaders(type: getTableViewType(tableView))
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat? {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat? {
         return  tableView == languagesTableView && section == 0 && viewModel.getRecents().count == 0
-                ? 0.0
-                : tableView.sectionHeaderHeight
+            ? 0.0
+            : tableView.sectionHeaderHeight
     }
     
-    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
         header.addShadow(radius: 6, opacity: 0.05)
         header.textLabel?.textColor = view.getModeTextColor()
         header.backgroundView?.backgroundColor = view.getModeColor()
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath, data: Decodable?) {
-        switch getTableViewType(tableView) {
-        case .languages:
-            viewModel.updateTrending(data: data, indexPath: indexPath)
-            search.isActive = false
-        default:
-            showDetails(index: indexPath.item)
-        }
-    }
-    
-    func tableViewDidScroll(_ tableView: UITableView, isScrollViewDown: Bool) {
-        guard tableView == self.tableView else { return }
-        let alpha: CGFloat = isScrollViewDown ? 0 : 1
+    override func tableViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>, isScrollingDown: Bool) {
+        guard scrollView == self.tableView else { return }
+        let alpha: CGFloat = isScrollingDown ? 0 : 1
         guard segmentedControl.alpha != alpha else { return }
         Animator.animate(view: segmentedControl, alpha: alpha, completion: nil)
     }
 }
 
+// MARK: - Extension
 // MARK: - SearchController
 
 extension ViewController: SearchControllerDelegate {
-
+    
     func updateSearchResults<T>(for searchController: UISearchController, filteredData: [T], filtering: Bool) where T : Decodable, T : Encodable {
         guard let data = filteredData as? [All] else { viewModel.removeAllFilteredData(); return }
         viewModel.setFilteredData(data: data)
@@ -245,59 +240,59 @@ extension ViewController: SearchControllerDelegate {
     func willPresentSearchController(_ searchController: UISearchController) {
         search.updateDataToFilter(data: viewModel.getLanguages(type: .all))
         languagesTableView.reloadData()
-        languagesTableView.alpha = 1
-        Animator.animate(view: segmentedControl, alpha: 0, duration: 0.3, completion: nil)
+        segmentedControl.isHidden = true
     }
     
     func willDismissSearchController(_ searchController: UISearchController) {
-        languagesTableView.alpha = 0
-        Animator.animate(view: segmentedControl, alpha: 1, duration: 0.5, delay: 0.2, completion: nil)
-        bottomLanguagesTableViewConstraint?.constant = 0
+        Animator.animate(view: languagesTableView, alpha: 0, duration: 0.3, completion: nil)
+    }
+    
+    func didPresentSearchController(_ searchController: UISearchController) {
+        Animator.animate(view: languagesTableView, alpha: 1, duration: 0.5, completion: nil)
+        log_info("LanguagesTableView is currently displayed")
+    }
+    
+    func didDismissSearchController(_ searchController: UISearchController) {
+        segmentedControl.isHidden = false
+        log_info("LanguagesTableView is currently hidden")
     }
 }
 
 // MARK: - SegmentedControl
 
 extension ViewController: SegmentedControlDelegate {
-
+    
     func indexChanged(_ sender: UISegmentedControl){
+        log_info("Current segmentedControl index: \(sender.selectedSegmentIndex)")
         viewModel.setCurrentSince(index: sender.selectedSegmentIndex)
     }
 }
-
-// MARK: - ProtocolDelegate
+// MARK: - HomeProtocolDelegate
 
 extension ViewController: HomeProtocolDelegate {
     
     func reloadTableView(isUpdating: Bool) {
         let alpha: CGFloat = isUpdating ? 0 : 1
-        self.tableView.reloadData()
-        Animator.addCATransition(view: self.tableView)
-        self.tableView.alpha = alpha
+        tableView.reloadData()
+        Animator.addCATransition(view: tableView)
+        tableView.alpha = alpha
         DispatchQueue.main.async {
             self.segmentedControl.isEnabled = self.title == "loading".localized ? false : true
         }
     }
     
     func reloadLanguagesTableView(){
-        self.languagesTableView.reloadData()
-        self.languagesTableView.scrollToTop(animated: false)
+        languagesTableView.reloadData()
+        languagesTableView.scrollToTop(animated: false)
     }
     
     func updateLeftButtonBarTitle(languageName: String?, count: Int){
-        self.title = languageName ?? "loading".localized
+        title = languageName ?? "loading".localized
         showActivityIndicator(bool: false)
+        log_info("Title updated to \(title ?? "No Title")")
     }
     
     func showActivityIndicator(bool: Bool) {
         bool ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
-    }
-}
-
-// MARK: - NavigationControllerDelegate
-
-extension ViewController {
-    override func setTapGestureAction() -> Selector? {
-        return #selector(scrollToTop)
     }
 }

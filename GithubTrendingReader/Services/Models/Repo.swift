@@ -34,8 +34,7 @@ class Repo: Codable {
     let stars, forks, currentPeriodStars: Int
     let builtBy: [BuiltBy]
     var urlString: String?
-    
-    
+
     // MARK: - Custom Functions
 
     func getTitle() -> NSMutableAttributedString {
@@ -45,10 +44,10 @@ class Repo: Codable {
     }
     
     func setUrlString(){
-        DispatchQueue.global(qos: .userInitiated).async {
-            
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let `self` = self else { return }
             guard self.urlString == nil else {
-                log_error("urlString already exists")
+//                log_info("urlString already exists")
                 return
             }
             do {

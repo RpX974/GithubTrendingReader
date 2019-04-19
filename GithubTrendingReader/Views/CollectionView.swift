@@ -13,7 +13,7 @@ import UIKit
 protocol CollectionViewProtocol: class {
     func setDataSource(_ collectionView: UICollectionView) -> [[Decodable]?]?
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath, data: Decodable?)
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell?
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, currentIndex: Int)
 }
 
@@ -21,7 +21,7 @@ protocol CollectionViewProtocol: class {
 
 extension CollectionViewProtocol {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath, data: Decodable?){}
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell { return cell }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell? { return nil }
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, currentIndex: Int){}
 }
 
@@ -35,6 +35,12 @@ class GenericCollectionViewCell<Data: Decodable>: UICollectionViewCell {
 
 class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>: UICollectionView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+
     // MARK: - Views
 
     fileprivate lazy var noDataLabel: UILabel = {
@@ -128,8 +134,8 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellType.stringClass, for: indexPath) as? CellType
             else { return CellType() }
         let data = getData(with: indexPath)
+        cell.configure(with: data)
         guard let overrideCell = self.globalDelegate?.collectionView(collectionView, cellForItemAt: indexPath, cell: cell, data: data) else {
-            cell.configure(with: data)
             return cell
         }
         return overrideCell
@@ -161,6 +167,7 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         
         let visiblePoint = CGPoint(x: visibleRect.midX, y: visibleRect.midY)
         guard let visibleIndexPath: IndexPath = self.indexPathForItem(at: visiblePoint) else { return }
+        log_info("CollectionView scrolled to cell at \(visibleIndexPath)")
         globalDelegate?.scrollViewDidEndDecelerating(scrollView, currentIndex: visibleIndexPath.item)
     }
     

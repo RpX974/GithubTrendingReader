@@ -14,13 +14,28 @@ import UIKit
 protocol SearchControllerDelegate: class {
     func willPresentSearchController(_ searchController: UISearchController)
     func willDismissSearchController(_ searchController: UISearchController)
+    func didDismissSearchController(_ searchController: UISearchController)
+    func didPresentSearchController(_ searchController: UISearchController)
     func updateSearchResults<T: Codable>(for searchController: UISearchController, filteredData: [T], filtering: Bool)
+}
+
+extension SearchControllerDelegate {
+    func willPresentSearchController(_ searchController: UISearchController) {}
+    func willDismissSearchController(_ searchController: UISearchController) {}
+    func didDismissSearchController(_ searchController: UISearchController) {}
+    func didPresentSearchController(_ searchController: UISearchController) {}
 }
 
 // MARK: - SearchController
 
 class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate {
     
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+
     // MARK: - Properties
 
     fileprivate var dataToFilter: [T]?
@@ -29,6 +44,9 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
 
     weak var globalDelegate: SearchControllerDelegate?
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return Constants.isDarkModeEnabled ? .lightContent : .default
+    }
     // MARK - Initializers
 
     override init(searchResultsController: UIViewController?) {
@@ -77,6 +95,14 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
         self.globalDelegate?.willDismissSearchController(searchController)
     }
     
+    func didDismissSearchController(_ searchController: UISearchController) {
+        self.globalDelegate?.didDismissSearchController(searchController)
+    }
+    
+    func didPresentSearchController(_ searchController: UISearchController) {
+        self.globalDelegate?.didPresentSearchController(searchController)
+    }
+    
     func updateSearchResults(for searchController: UISearchController) {
         
         var filtered: [T] = []
@@ -87,10 +113,8 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
             filtered = dataToFilter?.filter({ (value) -> Bool in
                 switch value {
                 case (let string as String):
-                    log_info("String")
                     return string.lowercased().contains(text.lowercased())
                 default:
-                    log_info("Default")
                     guard let dict = value.dictionary, let string = dict[valueToFilter] as? String else { return false }
                     return string.lowercased().contains(text.lowercased())
                 }

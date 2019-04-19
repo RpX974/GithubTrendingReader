@@ -9,70 +9,91 @@
 import Foundation
 import Promises
 
-enum TableViewType {
-    case repo, languages
-}
-
-enum LanguagesType {
-    case recents, popular, all
-}
-
 class HomeViewModel: GenericDataSourceViewModel<Repo> {
+
+    // MARK: - Deinit
+    
+    deinit {
+        log_done()
+    }
+    
+    // MARK: - Constants
+
+    struct PrivateConstants {
+        static let defaultLanguage: All = All.init(urlParam: Constants.defaultLanguageUrlParam, name: Constants.defaultLanguage)
+        static let defaultSince: SinceIndex = .daily
+    }
     
     // MARK: - Properties
 
-    weak var delegate: HomeProtocolDelegate?
-    
+    fileprivate weak var delegate: HomeProtocolDelegate?
+
+
     fileprivate var filtering = false
     fileprivate var language: Language?
+
+    fileprivate var _currentLanguage: All?
+    fileprivate var _currentSince: SinceIndex?
+    fileprivate var _recents: [All]?
+
+    fileprivate lazy var favoritesViewModel: FavoritesViewModel = {
+        return FavoritesViewModel()
+    }()
 
     fileprivate var filtered = [All]() {
         didSet {
             filtering = filtered.count > 0
         }
     }
-    fileprivate var currentLanguage: All? {
+    fileprivate var currentLanguage: All {
         get {
-            guard let data = UserDefaults.standard.data(forKey: Constants.UserDefault.language) else {
-                return All.init(urlParam: Constants.defaultLanguageUrlParam, name: Constants.defaultLanguage)
-            }
-            return try? JSONDecoder().decode(All.self, from: data)
+            return  _currentLanguage ?? All.retrieve(forKey: Constants.UserDefault.language) ??
+                    PrivateConstants.defaultLanguage
         }
         set {
-            guard let data = try? JSONEncoder().encode(newValue) else { return }
-            UserDefaults.standard.set(data, forKey: Constants.UserDefault.language)
+            newValue.save(forKey: Constants.UserDefault.language)
+            _currentLanguage = newValue
+            self.updateTrending()
         }
     }
     fileprivate var currentSince: SinceIndex {
         get {
+            if let since = _currentSince { return since }
             let index = UserDefaults.standard.integer(forKey: Constants.UserDefault.since)
-            return SinceIndex(rawValue: index) ?? .daily
+            return SinceIndex(rawValue: index) ?? PrivateConstants.defaultSince
         }
         set {
             UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefault.since)
+            _currentSince = newValue
             self.updateTrending()
         }
     }
-    fileprivate var recents = [All]() {
-        didSet {
-            let value = recents.compactMap({ try? JSONEncoder().encode($0) })
-            UserDefaults.standard.setValue(value, forKey: "recents")
+    fileprivate var recents: [All] {
+        get {
+            return _recents ?? All.retrieveArray(forKey: Constants.UserDefault.recents) ?? []
+        }
+        set {
+            newValue.saveArray(forKey: Constants.UserDefault.recents)
+            _recents = newValue
         }
     }
     
     // MARK: - Initializers
     
-    required init(delegate: HomeProtocolDelegate) {
+    required override init() {
         super.init()
-        self.delegate = delegate
     }
+    
+//    convenience init(delegate: HomeProtocolDelegate) {
+//        self.init()
+//        self.delegate = delegate
+//    }
 
     func start(){
-        getRecentsFromCache()
         getTrending()
             .then { [weak self] in
                 guard let `self` = self else { return }
-                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage?.name, count: self.dataSource.count)
+                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage.name, count: self.dataSource.count)
                 self.delegate?.reloadTableView(isUpdating: false)
             }
             .catch { error in
@@ -91,6 +112,10 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     // MARK: - Custom Functions
     // MARK: - SETTERS
 
+    func setDelegate(delegate: HomeProtocolDelegate) {
+        self.delegate = delegate
+    }
+    
     func appendRecent(recent: All?){
         guard let recent = recent else { return }
         if let index = recents.findIndex(predicate: {$0.name == recent.name}) {
@@ -101,13 +126,12 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     }
     
     func updateTrending(data: Decodable?, indexPath: IndexPath) {
-        var result: All? = data as? All
+        guard var result = data as? All else { return }
         if indexPath.section == 0 && filtering == true {
             result = filtered[indexPath.row]
         }
         appendRecent(recent: result)
         currentLanguage = result
-        updateTrending()
     }
     
     func removeAllFilteredData(){
@@ -131,6 +155,13 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     }
     
     // MARK: - GETTER
+    override func getGenericViewModel() -> GenericDataSourceViewModel<Repo>? {
+        return getFavoritesViewModel()
+    }
+    
+    func getFavoritesViewModel() -> FavoritesViewModel<Repo> {
+        return favoritesViewModel
+    }
     
     func getCurrentSince() -> Int {
         return currentSince.rawValue
@@ -156,7 +187,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         case .languages:
             return filtering ? [filtered] : [recents, language?.popular, language?.all]
         default:
-            return [dataSource]
+            return getListDataSource()
         }
     }
     
@@ -184,17 +215,12 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     }
     
     // MARK: - Requests
-    
-    func getRecentsFromCache(){
-        guard let data = UserDefaults.standard.array(forKey: "recents") as? [Data] else { return }
-        recents = data.compactMap({ try? JSONDecoder().decode(All.self, from: $0) })
-    }
 
     func updateTrending(){
         getTrending()
             .then { [weak self] in
                 guard let `self` = self else { return }
-                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage?.name, count: self.dataSource.count)
+                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage.name, count: self.dataSource.count)
                 self.delegate?.reloadTableView(isUpdating: false)
             }
             .catch { error in
@@ -208,7 +234,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
                 guard let `self` = self else { return }
                 switch result {
                 case .success(let data):
-                    log_info("Languages retrieved")
+                    log_info("All Languages retrieved")
                     self.language = data
                     let allLanguages = All.init(urlParam: Constants.defaultLanguageUrlParam,
                                                 name: Constants.defaultLanguage)
@@ -221,20 +247,21 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         })
     }
     
-    func getTrending(language: String = Constants.defaultLanguageUrlParam) -> Promise<()> {
+    func getTrending() -> Promise<()> {
         dataSource.removeAll()
         self.delegate?.updateLeftButtonBarTitle(languageName: nil, count: dataSource.count)
         self.delegate?.reloadTableView(isUpdating: true)
         self.delegate?.showActivityIndicator(bool: true)
         return Promise<()>(on: .global(qos: qosClass), { [weak self] (fullfill, reject) in
             guard let `self` = self else { return }
-            API.shared.getTrending(fromLanguage: self.currentLanguage?.urlParam ?? language, since: self.getSince(), completion: {
+            API.shared.getTrending(fromLanguage: self.currentLanguage.urlParam, since: self.getSince(), completion: {
                 [weak self] (result: Result<Repos>) in
                 guard let `self` = self else { return }
                 switch result {
                 case .success(let data):
-                    log_info("Repos retrieved")
-                    self.dataSource = data
+                    log_info("\(self.getSince().rawValue.capitalized) repos retrieved from \(self.currentLanguage.name)")
+                    self.dataSource.removeAll()
+                    self.dataSource.append(contentsOf: data)
                     fullfill(())
                     self.dataSource.forEach({ $0.setUrlString() })
                 case .failure(let error):

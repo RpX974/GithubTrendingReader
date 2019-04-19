@@ -38,7 +38,9 @@ class NavigationController: UINavigationController, UINavigationControllerDelega
         super.viewDidLoad()
         
         delegate = self
+        extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = view.getModeColor()
+        navigationItem.largeTitleDisplayMode = .automatic
         navigationBar.isTranslucent = false
         navigationBar.prefersLargeTitles = true
     }
@@ -46,7 +48,7 @@ class NavigationController: UINavigationController, UINavigationControllerDelega
     func clearNavigationBar() {
         navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationBar.shadowImage = UIImage()
-        self.view.backgroundColor = .clear
+        view.backgroundColor = .clear
     }
     
     func addTapGesture(target: UIViewController, action: Selector){

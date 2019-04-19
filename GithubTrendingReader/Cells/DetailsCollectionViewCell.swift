@@ -15,7 +15,6 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
     // MARK: - Deinit
 
     deinit {
-        showWebImage = nil
         log_done()
     }
 
