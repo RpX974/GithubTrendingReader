@@ -20,7 +20,7 @@ protocol GenericTableViewDelegate: GenericProtocol {
 
 protocol HomeProtocolDelegate: GenericTableViewDelegate {
     func reloadLanguagesTableView()
-    func updateLeftButtonBarTitle(languageName: String?, count: Int)
+    func updateLeftButtonBarTitle(languageName: String?)
     func showActivityIndicator(bool: Bool)
 }
 

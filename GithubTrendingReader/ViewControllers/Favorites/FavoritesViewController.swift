@@ -19,7 +19,7 @@ struct FavoritesConstants {
 
 // MARK: - FavoritesViewController
 
-class FavoritesViewController<Cell: RepoTableViewCell, ViewModel: FavoritesViewModel<Repo>> : GenericControllerWithTableView<Repo, Cell, ViewModel> {
+class FavoritesViewController<Cell: RepoTableViewCell, ViewModel: FavoritesViewModel> : GenericControllerWithTableView<Repo, Cell, ViewModel> {
     
     // MARK: - Deinit
 

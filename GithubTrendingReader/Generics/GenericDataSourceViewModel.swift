@@ -11,20 +11,29 @@ import Foundation
 class GenericDataSourceViewModel<Data: Codable> {
     
     // MARK: - Deinit
-
+    
     deinit {
         log_done()
     }
-
+    
     // MARK: - Properties
+    
+    fileprivate var _dataSource = [Data]()
 
-    var qosClass: DispatchQoS.QoSClass = .userInitiated
-    var dataSource = [Data]()
-    var numberOfItems: Int { return dataSource.count }
-
+    var dataSource: [Data] {
+        get { return _dataSource }
+        set { _dataSource = newValue }
+    }
+    var numberOfItems: Int {
+        return dataSource.count
+    }
+    
     // MARK: - Custom Functions
     // MARK: - GETTER
-
+    
+    required init() {
+    }
+    
     func getDataSource() -> [Data] {
         return dataSource
     }
@@ -45,5 +54,4 @@ class GenericDataSourceViewModel<Data: Codable> {
     func getGenericViewModel() -> GenericDataSourceViewModel<Data>? {
         return self
     }
-    
 }

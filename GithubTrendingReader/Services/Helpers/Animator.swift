@@ -47,9 +47,19 @@ class Animator {
         }
     }
     
-    static func animate(view: UIView, transform: CGAffineTransform , duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+    static func animate(view: UIView?, transform: CGAffineTransform , duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+        guard let view = view else { return }
         DispatchQueue.main.async {
             UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
+                view.transform = transform
+            }, completion: completion)
+        }
+    }
+    
+    static func animateReverse(view: UIView?, transform: CGAffineTransform , duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+        guard let view = view else { return }
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 5, options: [.curveEaseInOut, .autoreverse], animations: {
                 view.transform = transform
             }, completion: completion)
         }

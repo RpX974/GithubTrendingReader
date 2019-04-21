@@ -30,7 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func setupWindow(){
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = NavigationController.init(rootViewController: ViewController(firstInit: true))
+        window?.rootViewController = NavigationController.init(rootViewController: ViewController())
         window?.makeKeyAndVisible()
     }
 }

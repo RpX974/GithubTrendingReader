@@ -14,6 +14,14 @@ enum SinceIndex: Int {
     case daily
     case weekly
     case monthly
+    
+    func asString() -> String {
+        switch self {
+        case .daily: return "daily"
+        case .weekly: return "weekly"
+        case .monthly: return "monthly"
+        }
+    }
 }
 
 // MARK: - Since
@@ -22,6 +30,19 @@ enum Since: String {
     case daily = "daily"
     case weekly = "weekly"
     case monthly = "monthly"
+    
+    static func with(index: Int) -> Since {
+        let rawValue = (SinceIndex(rawValue: index) ?? .daily).asString()
+        return Since.init(rawValue: rawValue) ?? .daily
+    }
+    
+    func asInt() -> Int {
+        switch self {
+        case .daily: return 0
+        case .weekly: return 1
+        case .monthly: return 2
+        }
+    }
 }
 
 // MARK: - TableViewType

@@ -9,10 +9,8 @@
 import Foundation
 import UIKit
 
-class LanguageTableViewCell: GenericTableViewCell<All> {
-    
-    // MARK: - Deinit
-    
+class LanguageTableViewCell: GenericTableViewCell<Language> {
+        
     deinit {
         log_done()
     }
@@ -53,7 +51,7 @@ class LanguageTableViewCell: GenericTableViewCell<All> {
         separator.height(0.5)
     }
     
-    override func configure(with data: All?) {
+    override func configure(with data: Language?) {
         guard let data = data else { return }
         self.textLabel?.text = data.name
     }

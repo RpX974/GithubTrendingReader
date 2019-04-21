@@ -29,7 +29,7 @@ extension SearchControllerDelegate {
 // MARK: - SearchController
 
 class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate {
-    
+
     // MARK: - Deinit
     
     deinit {

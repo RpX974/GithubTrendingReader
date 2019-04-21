@@ -40,10 +40,15 @@ class WebView: UIWebView {
     
     // MARK - Initializers
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: .zero)
         setup()
     }
+    
+//    override init(frame: CGRect) {
+//        super.init(frame: frame)
+//        setup()
+//    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -55,9 +60,6 @@ class WebView: UIWebView {
         backgroundColor = .clear
         scrollView.backgroundColor = .clear
         isOpaque = false
-        allowsLinkPreview = true
-        allowsPictureInPictureMediaPlayback = true
-        allowsInlineMediaPlayback = true
     }
 }
 

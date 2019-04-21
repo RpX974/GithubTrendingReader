@@ -26,6 +26,7 @@ struct Constants {
     static let defaultLanguage: String = "All Languages"
     static let defaultLanguageUrlParam: String = "allLanguages"
     static let maxRecentsCount: Int = 10
+
     // MARK: - UserDefault
     
     struct UserDefault {

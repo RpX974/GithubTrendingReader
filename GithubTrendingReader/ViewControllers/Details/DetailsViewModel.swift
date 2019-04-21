@@ -10,25 +10,25 @@ import Foundation
 
 class DetailsViewModel: GenericDataSourceViewModel<Repo> {
     
+    typealias Data = Repo
+    
     // MARK: - Deinit
-
+    
     deinit {
         log_done()
     }
     
     // MARK: - Properties
     
+    weak var delegate: DetailsViewProtocolDelegate?
+
     fileprivate var currentIndex: Int = 0 {
         didSet {
             let title = getDataFrom(index: currentIndex)?.name
             delegate?.updateTitle(title: title)
         }
     }
-
-    var favorites = [Repo]()
-    
-    weak var delegate: DetailsViewProtocolDelegate?
-    
+        
     // MARK: - Initializers
     
     required init(delegate: DetailsViewProtocolDelegate) {
@@ -36,30 +36,29 @@ class DetailsViewModel: GenericDataSourceViewModel<Repo> {
         self.delegate = delegate
     }
     
+    required init() {
+        fatalError("init() has not been implemented")
+    }
+    
     // MARK: - Custom Functions
     // MARK: - SETTER
-
+    
     func setCurrentIndex(index: Int){
         currentIndex = index
     }
     
-    func setDataSource(data: [Repo]){
+    func setDataSource(data: [Data]){
         dataSource.removeAll()
         dataSource.append(contentsOf: data)
     }
     
     // MARK: - GETTER
-
+    
     func getCurrentIndex() -> Int {
         return currentIndex
     }
     
-    func getDataFromCurrentIndex() -> Repo?{
+    func getDataFromCurrentIndex() -> Data?{
         return getDataFrom(index: currentIndex)
-    }
-    
-    func isFavorite() -> Bool {
-        guard let data = getDataFromCurrentIndex() else { return false }
-        return favorites.contains(where: { $0.urlString == data.urlString})
     }
 }

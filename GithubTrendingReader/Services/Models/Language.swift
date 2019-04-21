@@ -8,17 +8,21 @@
 
 import Foundation
 
+// MARK: - Typealias
+
+typealias Languages = [Language]
+
 // MARK: - Language
 
-struct Language: Codable {
+struct AllLanguages: Codable {
     // MARK: - Properties
 
-    var popular, all: [All]
+    var popular, all: [Language]
 }
 
 // MARK: - All
 
-struct All: Codable {
+struct Language: Codable {
     // MARK: - Properties
 
     let urlParam, name: String

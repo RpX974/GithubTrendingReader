@@ -137,6 +137,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         default:
             if landscapeYOffset == nil { landscapeYOffset = yOffSet }
         }
+        self.setScrollIndicatorColor(color: self.getModeTextColor())
     }
     
     fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets){
@@ -246,7 +247,9 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-        if lastYOffset > scrollView.contentOffset.y && lastYOffset < scrollView.contentSize.height - scrollView.frame.height {
+        if scrollView.yOffSet == defaultYOffset {
+            self.globalDelegate?.tableViewDidScroll(scrollView, isScrollViewDown: false)
+        } else if lastYOffset > scrollView.contentOffset.y && lastYOffset < scrollView.contentSize.height - scrollView.frame.height {
             // move up
             self.globalDelegate?.tableViewDidScroll(scrollView, isScrollViewDown: false)
         } else if lastYOffset < scrollView.contentOffset.y && scrollView.contentOffset.y > 0 {

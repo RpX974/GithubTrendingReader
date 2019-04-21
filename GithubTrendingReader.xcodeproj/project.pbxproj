@@ -31,6 +31,8 @@
 		ACC9FAD42264862900CEB8A7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = ACC9FAD62264862900CEB8A7 /* Localizable.strings */; };
 		ACC9FAD822648B7B00CEB8A7 /* Enum.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC9FAD722648B7B00CEB8A7 /* Enum.swift */; };
 		ACC9FADA2264994300CEB8A7 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC9FAD92264994300CEB8A7 /* Animator.swift */; };
+		ACD0A155226BD17B009F75EF /* LanguagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD0A154226BD17B009F75EF /* LanguagesViewModel.swift */; };
+		ACD0A157226BEE21009F75EF /* RepoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD0A156226BEE21009F75EF /* RepoViewModel.swift */; };
 		ACD1BED922675A3B000D278B /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD1BED822675A3B000D278B /* CollectionView.swift */; };
 		ACD3823A22665E5B00C5AE8A /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD3823922665E5B00C5AE8A /* TableView.swift */; };
 		ACD3823E2266ADAF00C5AE8A /* DetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD3823D2266ADAF00C5AE8A /* DetailsViewModel.swift */; };
@@ -69,6 +71,8 @@
 		ACC9FAD52264862900CEB8A7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		ACC9FAD722648B7B00CEB8A7 /* Enum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enum.swift; sourceTree = "<group>"; };
 		ACC9FAD92264994300CEB8A7 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
+		ACD0A154226BD17B009F75EF /* LanguagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagesViewModel.swift; sourceTree = "<group>"; };
+		ACD0A156226BEE21009F75EF /* RepoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoViewModel.swift; sourceTree = "<group>"; };
 		ACD1BED822675A3B000D278B /* CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		ACD3823922665E5B00C5AE8A /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		ACD3823D2266ADAF00C5AE8A /* DetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewModel.swift; sourceTree = "<group>"; };
@@ -124,7 +128,6 @@
 			isa = PBXGroup;
 			children = (
 				AC54E1A822691B6800979B6E /* FavoritesViewController.swift */,
-				AC54E1A52268EE5500979B6E /* FavoritesViewModel.swift */,
 			);
 			path = Favorites;
 			sourceTree = "<group>";
@@ -223,6 +226,16 @@
 			path = Storyboards;
 			sourceTree = "<group>";
 		};
+		ACD0A158226BF856009F75EF /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				ACD0A156226BEE21009F75EF /* RepoViewModel.swift */,
+				ACD0A154226BD17B009F75EF /* LanguagesViewModel.swift */,
+				AC54E1A52268EE5500979B6E /* FavoritesViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		ACD382452266BF9A00C5AE8A /* Css */ = {
 			isa = PBXGroup;
 			children = (
@@ -256,6 +269,7 @@
 				ACF92BFF22625F1300A6809B /* Assets.xcassets */,
 				ACAF6345226262640022B2DA /* Storyboards */,
 				AC0FAFEC2262737D00A0E151 /* Generics */,
+				ACD0A158226BF856009F75EF /* ViewModels */,
 				ACAF633C226261770022B2DA /* ViewControllers */,
 				ACAF6343226262450022B2DA /* Cells */,
 				ACAF63422262623B0022B2DA /* Views */,
@@ -344,6 +358,7 @@
 				AC0FAFE92262727A00A0E151 /* Repo.swift in Sources */,
 				AC54E1A922691B6800979B6E /* FavoritesViewController.swift in Sources */,
 				ACF92BFB22625F1200A6809B /* ViewController.swift in Sources */,
+				ACD0A155226BD17B009F75EF /* LanguagesViewModel.swift in Sources */,
 				ACC9FADA2264994300CEB8A7 /* Animator.swift in Sources */,
 				ACC699A82263D216005C1F00 /* Protocols.swift in Sources */,
 				AC0FAFEE2262738900A0E151 /* GenericDataSourceViewModel.swift in Sources */,
@@ -367,6 +382,7 @@
 				ACD382422266B4C800C5AE8A /* ClassHelper.swift in Sources */,
 				ACC699A42263D186005C1F00 /* StackView.swift in Sources */,
 				ACAF634B226267AF0022B2DA /* API.swift in Sources */,
+				ACD0A157226BEE21009F75EF /* RepoViewModel.swift in Sources */,
 				AC3FABF42266036C0038B6AE /* SegmentedControl.swift in Sources */,
 				AC0FAFF5226285D800A0E151 /* DetailsViewController.swift in Sources */,
 			);

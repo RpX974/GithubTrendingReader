@@ -41,6 +41,11 @@ class SegmentedControl: UISegmentedControl {
         self.setTitleTextAttributes(attrs, for: .normal)
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.addShadow(radius: 5, opacity: 0.2)
+    }
+    
     // MARK: - Custom Functions
 
     @objc fileprivate func indexChanged(_ sender: UISegmentedControl){

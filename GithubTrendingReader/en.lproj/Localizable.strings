@@ -13,7 +13,7 @@
 "weekly"="Weekly";
 "monthly"="Monthly";
 "build_by"="Build by";
-"no_repo"="Trending repositories results are currently being dissected.";
+"no_repo"="There is no repository available";
 "favorites" = "Favorites";
 "no_favorites"="There is no repository in favorite";
 

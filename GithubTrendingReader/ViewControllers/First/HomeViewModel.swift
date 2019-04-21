@@ -10,7 +10,7 @@ import Foundation
 import Promises
 
 class HomeViewModel: GenericDataSourceViewModel<Repo> {
-
+    
     // MARK: - Deinit
     
     deinit {
@@ -18,88 +18,86 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     }
     
     // MARK: - Constants
-
+    
     struct PrivateConstants {
-        static let defaultLanguage: All = All.init(urlParam: Constants.defaultLanguageUrlParam, name: Constants.defaultLanguage)
-        static let defaultSince: SinceIndex = .daily
+        static let defaultLanguage: Language = Language.init(urlParam: Constants.defaultLanguageUrlParam, name: Constants.defaultLanguage)
+        static let defaultSince: Since = .daily
+        
+        struct Format {
+            static func recents(count: Int) -> String { return String(format: "recents".localized, count) }
+            static func populars(count: Int) -> String { return String(format: "populars".localized, count) }
+            static func all(count: Int) -> String { return String(format: "all_languages".localized, count) }
+        }
     }
     
     // MARK: - Properties
-
+    
     fileprivate weak var delegate: HomeProtocolDelegate?
-
-
-    fileprivate var filtering = false
-    fileprivate var language: Language?
-
-    fileprivate var _currentLanguage: All?
-    fileprivate var _currentSince: SinceIndex?
-    fileprivate var _recents: [All]?
-
-    fileprivate lazy var favoritesViewModel: FavoritesViewModel = {
-        return FavoritesViewModel()
-    }()
-
-    fileprivate var filtered = [All]() {
-        didSet {
-            filtering = filtered.count > 0
-        }
-    }
-    fileprivate var currentLanguage: All {
-        get {
-            return  _currentLanguage ?? All.retrieve(forKey: Constants.UserDefault.language) ??
-                    PrivateConstants.defaultLanguage
-        }
+    
+    fileprivate let repoViewModel           = RepoViewModel()
+    fileprivate let languagesViewModel      = LanguagesViewModel()
+    fileprivate lazy var favoritesViewModel : FavoritesViewModel = { return FavoritesViewModel() }()
+    
+    fileprivate var _currentSince   : Since?
+    fileprivate var filtering       = false
+    fileprivate var filtered        = Languages() { didSet { filtering = filtered.count > 0 } }
+    fileprivate var currentLanguage : Language {
+        get { return languages.getCurrentLanguage() }
         set {
-            newValue.save(forKey: Constants.UserDefault.language)
-            _currentLanguage = newValue
-            self.updateTrending()
+            self.appendRecent(recent: newValue)
+            getTrending()
         }
     }
-    fileprivate var currentSince: SinceIndex {
+    fileprivate var currentSince    : Since {
         get {
             if let since = _currentSince { return since }
             let index = UserDefaults.standard.integer(forKey: Constants.UserDefault.since)
-            return SinceIndex(rawValue: index) ?? PrivateConstants.defaultSince
+            return Since.with(index: index)
         }
         set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.UserDefault.since)
+            UserDefaults.standard.set(newValue.asInt(), forKey: Constants.UserDefault.since)
             _currentSince = newValue
-            self.updateTrending()
+            getTrending()
         }
     }
-    fileprivate var recents: [All] {
-        get {
-            return _recents ?? All.retrieveArray(forKey: Constants.UserDefault.recents) ?? []
-        }
-        set {
-            newValue.saveArray(forKey: Constants.UserDefault.recents)
-            _recents = newValue
-        }
+    
+    var languages: LanguagesViewModel { return languagesViewModel }
+    var favorites: FavoritesViewModel { return favoritesViewModel }
+    
+    override var dataSource: [Repo] {
+        get { return repoViewModel.getDataSource() }
+        set { repoViewModel.dataSource = newValue }
     }
     
     // MARK: - Initializers
     
-    required override init() {
-        super.init()
-    }
     
-//    convenience init(delegate: HomeProtocolDelegate) {
-//        self.init()
-//        self.delegate = delegate
-//    }
-
+    // MARK: - Start
+    
     func start(){
         getTrending()
+        getLanguages()
+    }
+    
+    // MARK: - Requests
+    
+    func getTrending() {
+        repoViewModel.getTrending(with: currentLanguage, since: currentSince)
             .then { [weak self] in
                 guard let `self` = self else { return }
-                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage.name, count: self.dataSource.count)
+                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage.name)
                 self.delegate?.reloadTableView(isUpdating: false)
+                self.dataSource.forEach({ $0.createHTML() })
             }
             .catch { error in
                 log_error(error.localizedDescription)
         }
-        getAllLanguages()
+        delegate?.updateLeftButtonBarTitle(languageName: nil)
+        delegate?.reloadTableView(isUpdating: true)
+    }
+    
+    func getLanguages() {
+        languages.start()
             .then { [weak self] in
                 guard let `self` = self else { return }
                 self.delegate?.reloadLanguagesTableView()
@@ -109,83 +107,63 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         }
     }
     
-    // MARK: - Custom Functions
     // MARK: - SETTERS
-
+    
     func setDelegate(delegate: HomeProtocolDelegate) {
         self.delegate = delegate
     }
     
-    func appendRecent(recent: All?){
-        guard let recent = recent else { return }
-        if let index = recents.findIndex(predicate: {$0.name == recent.name}) {
-            recents.remove(at: index)
-        }
-        if recents.count == Constants.maxRecentsCount { recents.removeLast() }
-        recents.insert(recent, at: 0)
+    func appendRecent(recent: Language?){
+        languages.appendRecent(recent: recent)
     }
     
-    func updateTrending(data: Decodable?, indexPath: IndexPath) {
-        guard var result = data as? All else { return }
+    func setCurrentLanguage(data: Decodable?, indexPath: IndexPath) {
+        guard var result = data as? Language else { return }
         if indexPath.section == 0 && filtering == true {
             result = filtered[indexPath.row]
         }
-        appendRecent(recent: result)
         currentLanguage = result
+    }
+    
+    func setFilteredData(data: [Language]){
+        removeAllFilteredData()
+        filtered.append(contentsOf: data)
     }
     
     func removeAllFilteredData(){
         filtered.removeAll()
     }
     
-    func setFilteredData(data: [All]){
-        removeAllFilteredData()
-        filtered.append(contentsOf: data)
-    }
-    
     func setCurrentSince(index: Int){
-        switch index {
-        case 1:
-            currentSince = .weekly
-        case 2:
-            currentSince = .monthly
-        default:
-            currentSince = .daily
-        }
+        currentSince = Since.with(index: index)
     }
     
     // MARK: - GETTER
+    
     override func getGenericViewModel() -> GenericDataSourceViewModel<Repo>? {
         return getFavoritesViewModel()
     }
     
-    func getFavoritesViewModel() -> FavoritesViewModel<Repo> {
+    func getFavoritesViewModel() -> FavoritesViewModel {
         return favoritesViewModel
     }
     
     func getCurrentSince() -> Int {
-        return currentSince.rawValue
+        return currentSince.asInt()
     }
     
-    func getLanguages(type: LanguagesType) -> [All]? {
-        switch type {
-        case .recents:
-            return recents
-        case .popular:
-            return language?.popular
-        default:
-            return language?.all
-        }
+    func getLanguages(type: LanguagesType) -> [Language]? {
+        return languages.getLanguages(type: type)
     }
     
-    func getRecents() -> [All] {
-        return recents
+    func getRecents() -> [Language] {
+        return languages.getLanguages(type: .recents)
     }
     
     func getTableViewDataSource(type: TableViewType) -> [[Decodable]?]? {
         switch type {
         case .languages:
-            return filtering ? [filtered] : [recents, language?.popular, language?.all]
+            return filtering ? [filtered] : languages.getAllLanguages()
         default:
             return getListDataSource()
         }
@@ -194,80 +172,12 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     func getTitleHeaders(type: TableViewType) -> [String]? {
         switch type {
         case .languages:
-            return [filtering ? String(format: "results".localized, filtered.count)
-                : String(format: "recents".localized, recents.count),
-                    String(format: "populars".localized, language?.popular.count ?? 0),
-                    String(format: "all_languages".localized, language?.all.count ?? 0)]
+            return [filtering ? String(format: "results".localized, filtered.count) :
+                PrivateConstants.Format.recents(count: languages.getLanguages(type: .recents).count),
+                    PrivateConstants.Format.populars(count: languages.getLanguages(type: .popular).count),
+                    PrivateConstants.Format.all(count: languages.getLanguages(type: .all).count)]
         default:
             return nil
         }
-    }
-    
-    func getSince() -> Since {
-        switch currentSince {
-        case .daily:
-            return .daily
-        case .weekly:
-            return .weekly
-        case .monthly:
-            return .monthly
-        }
-    }
-    
-    // MARK: - Requests
-
-    func updateTrending(){
-        getTrending()
-            .then { [weak self] in
-                guard let `self` = self else { return }
-                self.delegate?.updateLeftButtonBarTitle(languageName: self.currentLanguage.name, count: self.dataSource.count)
-                self.delegate?.reloadTableView(isUpdating: false)
-            }
-            .catch { error in
-                log_error(error.localizedDescription)
-        }
-    }
-    
-    func getAllLanguages() -> Promise<()>{
-        return Promise<()>(on: .global(qos: .background), { (fullfill, reject) in
-            API.shared.getAllLanguages(completion: { [weak self] (result: Result<Language>) in
-                guard let `self` = self else { return }
-                switch result {
-                case .success(let data):
-                    log_info("All Languages retrieved")
-                    self.language = data
-                    let allLanguages = All.init(urlParam: Constants.defaultLanguageUrlParam,
-                                                name: Constants.defaultLanguage)
-                    self.language?.popular.insert(allLanguages, at: 0)
-                    fullfill(())
-                case .failure(let error):
-                    reject(error)
-                }
-            })
-        })
-    }
-    
-    func getTrending() -> Promise<()> {
-        dataSource.removeAll()
-        self.delegate?.updateLeftButtonBarTitle(languageName: nil, count: dataSource.count)
-        self.delegate?.reloadTableView(isUpdating: true)
-        self.delegate?.showActivityIndicator(bool: true)
-        return Promise<()>(on: .global(qos: qosClass), { [weak self] (fullfill, reject) in
-            guard let `self` = self else { return }
-            API.shared.getTrending(fromLanguage: self.currentLanguage.urlParam, since: self.getSince(), completion: {
-                [weak self] (result: Result<Repos>) in
-                guard let `self` = self else { return }
-                switch result {
-                case .success(let data):
-                    log_info("\(self.getSince().rawValue.capitalized) repos retrieved from \(self.currentLanguage.name)")
-                    self.dataSource.removeAll()
-                    self.dataSource.append(contentsOf: data)
-                    fullfill(())
-                    self.dataSource.forEach({ $0.setUrlString() })
-                case .failure(let error):
-                    reject(error)
-                }
-            })
-        })
     }
 }

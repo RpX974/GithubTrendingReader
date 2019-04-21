@@ -48,9 +48,22 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     var scrollToIndex: ((Int) -> Void)!
     
     // MARK - Initializers
-
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        self.setViewModel()
+    }
+    
     convenience init(viewModel: ViewModel) {
         self.init()
+        self.setViewModel(viewModel: viewModel)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setViewModel(viewModel: ViewModel = ViewModel()) {
         self.viewModel = viewModel
     }
     
@@ -60,11 +73,6 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
         setupUI()
         setupConstraints()
         setScrollToIndex()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.setScrollIndicatorColor(color: view.getModeTextColor())
     }
     
     func setupUI(){
@@ -95,7 +103,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     
     func showDetails(index: Int){
         log_info("Cell tapped at \(index)")
-        guard let favoritesViewModel = viewModel.getGenericViewModel() as? FavoritesViewModel<Repo> else { return }
+        guard let favoritesViewModel = viewModel.getGenericViewModel() as? FavoritesViewModel else { return }
         let vc = DetailsViewController(favoritesViewModel: favoritesViewModel,
                                        repos: viewModel.getDataSource(),
                                        index: index,

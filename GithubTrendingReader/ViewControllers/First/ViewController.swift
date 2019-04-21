@@ -13,7 +13,7 @@ import TinyConstraints
 
 struct HomeConstants {
     static let titleToSet: String = "loading".localized
-    static let noDataText: String = "no_data".localized
+    static let noDataText: String = "no_repo".localized
     static let cellSize: CGFloat = 80.0
     static let segmentedControlItems: [String] = ["daily".localized, "weekly".localized, "monthly".localized]
     static let darkModeEnabledImage: UIImage? = "moon".image
@@ -28,7 +28,9 @@ struct HomeConstants {
 
 // MARK: - ViewController
 
-class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewModel>: GenericControllerWithTableView<Repo, Cell, ViewModel> {
+class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWithTableView<Repo, Cell, HomeViewModel> {
+    
+    typealias ViewModel = HomeViewModel
     
     // MARK: - Deinit
     
@@ -46,13 +48,13 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
         sc.delegate = self
         return sc
     }()
-    fileprivate lazy var search: SearchController<All> = {
-        let search = SearchController<All>(placeholder: "other_language".localized, tintColor: view.getModeTextColor(), obscuresBackgroundDuringPresentation: false)
+    fileprivate lazy var search: SearchController<Language> = {
+        let search = SearchController<Language>(placeholder: "other_language".localized, tintColor: view.getModeTextColor(), obscuresBackgroundDuringPresentation: false)
         search.globalDelegate = self
         return search
     }()
-    fileprivate lazy var languagesTableView: TableView<All, LanguageTableViewCell> = {
-        let tableView = TableView<All, LanguageTableViewCell>(backgroundColor: view.getModeColor(),
+    fileprivate lazy var languagesTableView: TableView<Language, LanguageTableViewCell> = {
+        let tableView = TableView<Language, LanguageTableViewCell>(backgroundColor: view.getModeColor(),
                                                               estimateRowHeight: 44.0,
                                                               sectionHeaderHeight: 44.0,
                                                               alpha: 0.0)
@@ -83,10 +85,9 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
     
     // MARK - Initializers
     
-    convenience init(firstInit: Bool?) {
-        let viewModel = ViewModel()
-        self.init(viewModel: viewModel)
-        viewModel.setDelegate(delegate: self)
+    override func setViewModel(viewModel: HomeViewModel) {
+        super.setViewModel(viewModel: viewModel)
+        self.viewModel.setDelegate(delegate: self)
     }
     
     override func viewDidLoad() {
@@ -97,11 +98,6 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
         setupNotificationKeyboard()
         initFakeWebView()
         viewModel.start()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        segmentedControl.addShadow(radius: 5, opacity: 0.1)
     }
     
     override func addAllSubviews() {
@@ -138,7 +134,6 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
     
     fileprivate func initFakeWebView() {
         webView = UIWebView.init(frame: .zero)
-        view.addSubview(webView)
         let url = URL(string: Constants.HTML.google)
         let request = URLRequest(url: url!)
         webView.loadRequest(request)
@@ -153,7 +148,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
     
     @objc fileprivate func showFavorites(){
         let viewModel = self.viewModel.getFavoritesViewModel()
-        let vc = FavoritesViewController<RepoTableViewCell, FavoritesViewModel<Repo>>(viewModel: viewModel)
+        let vc = FavoritesViewController(viewModel: viewModel)
         self.navigationController?.pushViewController(vc, animated: true)
         log_info("Pushing to FavoritesViewController")
     }
@@ -174,8 +169,8 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
         navigationItem.rightBarButtonItem?.tintColor = view.getModeTextColor()
         navigationItem.leftBarButtonItem?.tintColor = view.getModeTextColor()
         navigationItem.leftBarButtonItem?.image = HomeConstants.leftBarButtonImage
-        viewModel.dataSource.forEach{ $0.refreshUrlString() }
-        viewModel.getFavoritesViewModel().refreshUrl()
+        viewModel.dataSource.forEach{ $0.refreshHTML() }
+        viewModel.getFavoritesViewModel().refreshHTML()
         if let indexs = tableView.indexPathsForVisibleRows {
             tableView.reloadRows(at: indexs, with: .none)
         }
@@ -193,8 +188,10 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
         switch getTableViewType(tableView) {
         case .languages:
             log_info("Cell tapped at \(indexPath) from LanguagesTableView")
-            viewModel.updateTrending(data: data, indexPath: indexPath)
-            search.isActive = false
+            viewModel.setCurrentLanguage(data: data, indexPath: indexPath)
+            if search.isActive == true {
+                search.isActive = false
+            }
         default:
             log_info("Cell tapped at \(indexPath) from defaultTableView")
             showDetails(index: indexPath.item)
@@ -237,7 +234,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell, ViewModel: HomeViewMod
 extension ViewController: SearchControllerDelegate {
     
     func updateSearchResults<T>(for searchController: UISearchController, filteredData: [T], filtering: Bool) where T : Decodable, T : Encodable {
-        guard let data = filteredData as? [All] else { viewModel.removeAllFilteredData(); return }
+        guard let data = filteredData as? [Language] else { viewModel.removeAllFilteredData(); return }
         viewModel.setFilteredData(data: data)
         self.reloadLanguagesTableView()
     }
@@ -283,6 +280,7 @@ extension ViewController: HomeProtocolDelegate {
         tableView.alpha = alpha
         DispatchQueue.main.async {
             self.segmentedControl.isEnabled = self.title == "loading".localized ? false : true
+            self.showActivityIndicator(bool: isUpdating)
         }
     }
     
@@ -291,9 +289,8 @@ extension ViewController: HomeProtocolDelegate {
         languagesTableView.scrollToTop(animated: false)
     }
     
-    func updateLeftButtonBarTitle(languageName: String?, count: Int){
+    func updateLeftButtonBarTitle(languageName: String?){
         title = languageName ?? "loading".localized
-        showActivityIndicator(bool: false)
         log_info("Title updated to \(title ?? "No Title")")
     }
     

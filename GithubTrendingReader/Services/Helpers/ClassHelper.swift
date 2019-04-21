@@ -80,4 +80,11 @@ class ClassHelper {
         }
         vc.setNeedsStatusBarAppearanceUpdate()
     }
+    
+    static func measureTime(completion: SuccessCallBack){
+        let start = CFAbsoluteTimeGetCurrent()
+        completion()
+        let diff = CFAbsoluteTimeGetCurrent() - start
+        log_info("Took \(diff) seconds")
+    }
 }

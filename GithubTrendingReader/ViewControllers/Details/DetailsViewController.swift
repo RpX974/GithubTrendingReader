@@ -57,7 +57,7 @@ class DetailsViewController: UIViewController {
 
     fileprivate var first = true
     fileprivate lazy var viewModel = DetailsViewModel(delegate: self)
-    fileprivate var favoritesViewModel: FavoritesViewModel<Repo>!
+    fileprivate var favoritesViewModel: FavoritesViewModel!
     
     // MARK - Closures
     
@@ -66,7 +66,7 @@ class DetailsViewController: UIViewController {
 
     // MARK: - View Configuration
     
-    convenience init(favoritesViewModel: FavoritesViewModel<Repo>, repos: Repos, index: Int, scrollToIndex: ((Int) -> Void)?) {
+    convenience init(favoritesViewModel: FavoritesViewModel, repos: Repos, index: Int, scrollToIndex: ((Int) -> Void)?) {
         self.init()
         log_start()
         self.favoritesViewModel = favoritesViewModel
@@ -85,18 +85,18 @@ class DetailsViewController: UIViewController {
         setupNotificationCenter()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         guard first else { return }
         DispatchQueue.main.async {
             self.collectionView.scrollToItem(indexPath: .init(item: self.viewModel.getCurrentIndex(), section: 0), animated: false)
         }
         first = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
     }
     
     fileprivate func setupUI(){

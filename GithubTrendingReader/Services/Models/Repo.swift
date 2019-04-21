@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import Promises
 
 // MARK: - Typealias
 
@@ -33,7 +34,7 @@ class Repo: Codable {
     let languageColor: String?
     let stars, forks, currentPeriodStars: Int
     let builtBy: [BuiltBy]
-    var urlString: String?
+    var html: String?
 
     // MARK: - Custom Functions
 
@@ -43,37 +44,43 @@ class Repo: Codable {
         return attributedText
     }
     
-    func setUrlString(){
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let `self` = self else { return }
-            guard self.urlString == nil else {
-//                log_info("urlString already exists")
-                return
-            }
+    // MARK: - SETTERS
+    
+    fileprivate func setHTML() -> Promise<String> {
+        return Promise<String>(on: .global(qos: .userInitiated), { (fullfill, reject) in
             do {
+                typealias HTML = Constants.HTML
                 guard let url = URL.init(string: self.url), let contents = try String(contentsOf: url, encoding: .utf8)
-                    .slice(from: Constants.HTML.sliceFrom, to: Constants.HTML.sliceTo)?
-                    .replacingOccurrences(of: String(format: Constants.HTML.replacingOf, self.author, self.name), with:
-                        String(format: Constants.HTML.replacingWith, Constants.github, self.author, self.name))
+                    .slice(from: HTML.sliceFrom, to: HTML.sliceTo)?
+                    .replacingOccurrences(of: String(format: HTML.replacingOf, self.author, self.name), with:
+                        String(format: HTML.replacingWith, Constants.github, self.author, self.name))
                     else { return }
                 let style = Constants.isDarkModeEnabled ? Constants.CSS.darkMode : Constants.CSS.whiteMode
-                self.urlString = String(format: Constants.HTML.urlFormat, style, contents)
+                self.html = String(format: HTML.urlFormat, style, contents)
+                fullfill(self.html ?? "")
             } catch let error {
-                log_error(error.localizedDescription)
+                reject(error)
             }
-        }
+        })
     }
     
-    func refreshUrlString(){
-        self.urlString = nil
-        setUrlString()
+    func createHTML(completion: ResultCompletion<String>? = nil) {
+        guard self.html == nil else { completion?(.success(self.html ?? "")); return }
+        self.setHTML().then({ (html) in
+            completion?(.success(html))
+        }).catch({ (error) in
+            completion?(.failure(error))
+        })
     }
     
-    func getUrlString() -> String? {
-        guard let url = urlString else {
-            setUrlString()
-            return urlString
-        }
-        return url
+    func refreshHTML(){
+        self.html = nil
+        createHTML()
+    }
+    
+    // MARK: - GETTER
+
+    func getHTML(_ completion: ResultCompletion<String>?) {
+        createHTML(completion: completion)
     }
 }

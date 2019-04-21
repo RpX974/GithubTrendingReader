@@ -73,12 +73,15 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
     // MARK: - Custom Functions
     
     fileprivate func loadWebView(repo: Repo){
-        guard let url = repo.getUrlString() else { return }
-        if let fake = URL(string: Constants.HTML.aboutBlank) {
-            let request = URLRequest(url: fake)
-            webView.loadRequest(request)
+        repo.getHTML { [weak self] (result) in
+            guard let `self` = self else { return }
+            switch result {
+            case .success (let url):
+                self.webView.loadHTMLString(url, baseURL: Bundle.main.bundleURL)
+            case .failure(let error):
+                log_error(error.localizedDescription)
+            }
         }
-        webView.loadHTMLString(url, baseURL: Bundle.main.bundleURL)
     }
     
     // MARK: - Delegation
