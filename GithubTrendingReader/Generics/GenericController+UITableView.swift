@@ -21,10 +21,10 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
 
     lazy var tableView: TableView<Data, Cell> = {
         let tableView = TableView<Data, Cell>(backgroundColor: view.getModeColor(),
-                                                           estimateRowHeight: 60.0,
-                                                           contentInset: self.contentInset,
-                                                           enableHighlight: true,
-                                                           noDataText: noDataText)
+                                              estimateRowHeight: 60.0,
+                                              contentInset: self.contentInset,
+                                              enableHighlight: true,
+                                              noDataText: noDataText)
         tableView.globalDelegate = self
         return tableView
     }()
@@ -54,8 +54,12 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
         self.setViewModel()
     }
     
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
     convenience init(viewModel: ViewModel) {
-        self.init()
+        self.init(nibName: nil, bundle: nil)
         self.setViewModel(viewModel: viewModel)
     }
     

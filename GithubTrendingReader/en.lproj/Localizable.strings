@@ -16,6 +16,7 @@
 "no_repo"="There is no repository available";
 "favorites" = "Favorites";
 "no_favorites"="There is no repository in favorite";
+"unknown"="Unknown";
 
 //STRING FORMAT
 "results"="Results (%d)";

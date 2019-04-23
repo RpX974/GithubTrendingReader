@@ -371,8 +371,8 @@ extension Encodable {
         return try encoder.encode(self)
     }
     
-    func string(using encoder: JSONEncoder = JSONEncoder()) throws -> String {
-        return try String(data: encoder.encode(self), encoding: .utf8)!
+    func string(using encoder: JSONEncoder = JSONEncoder()) -> String? {
+        return try! String(data: encoder.encode(self), encoding: .utf8)
     }
 }
 

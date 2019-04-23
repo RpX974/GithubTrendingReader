@@ -36,39 +36,45 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
     
     // MARK: - Views
     
-    lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.font = UIFont.bold(size: 20)
-        label.backgroundColor = .clear
-        label.numberOfLines = 0
+    // MARK: - Labels
+
+    lazy var nameLabel: Label = {
+        let label = Label.init(fontSize: 20, isBold: true, isMultiline: true)
         return label
     }()
     
-    lazy var descriptionLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.backgroundColor = .clear
-        label.font = UIFont.regular(size: 14)
-        label.numberOfLines = 0
+    lazy var descriptionLabel: Label = {
+        let label = Label.init(fontSize: 14, isBold: false, isMultiline: true)
         return label
     }()
     
-    lazy var circle: UIView = {
-        let v = UIView()
-        v.height(PrivateConstants.circleSize)
-        v.width(PrivateConstants.circleSize)
-        v.addCornerRadius(radius: PrivateConstants.circleSize/2)
-        return v
+    lazy var languageLabel: Label = {
+        let label = Label.init(fontSize: 12, isBold: false)
+        return label
+    }()
+
+    lazy var starLabel: Label = {
+        let label = Label.init(fontSize: 12, isBold: false)
+        return label
     }()
     
-    lazy var languageLabel: UILabel = {
-        let l = UILabel()
-        l.font = UIFont.regular(size: 12)
-        l.textColor = l.getModeTextColor()
-        return l
+    lazy var starTodayLabel: Label = {
+        let label = Label.init(fontSize: 12, isBold: false)
+        return label
     }()
     
+    lazy var forkLabel: Label = {
+        let label = Label.init(fontSize: 12, isBold: false)
+        return label
+    }()
+    
+    lazy var buildByLabel: Label = {
+        let label = Label.init(text: "build_by".localized, fontSize: 12, isBold: false)
+        return label
+    }()
+    
+    // MARK: - ImageViews
+
     lazy var star: UIImageView = {
         let iv = UIImageView.init(image: PrivateConstants.Image.star)
         iv.height(PrivateConstants.circleSize)
@@ -78,13 +84,6 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         return iv
     }()
 
-    lazy var starLabel: UILabel = {
-        let l = UILabel()
-        l.font = UIFont.regular(size: 12)
-        l.textColor = l.getModeTextColor()
-        return l
-    }()
-    
     lazy var starToday: UIImageView = {
         let iv = UIImageView.init(image: PrivateConstants.Image.star)
         iv.height(PrivateConstants.circleSize)
@@ -92,13 +91,6 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         iv.contentMode = .scaleAspectFit
         iv.tintColor = iv.getModeTextColor().withAlphaComponent(0.8)
         return iv
-    }()
-    
-    lazy var starTodayLabel: UILabel = {
-        let l = UILabel()
-        l.font = UIFont.regular(size: 12)
-        l.textColor = l.getModeTextColor()
-        return l
     }()
     
     lazy var fork: UIImageView = {
@@ -110,20 +102,30 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         return iv
     }()
     
-    lazy var forkLabel: UILabel = {
-        let l = UILabel()
-        l.font = UIFont.regular(size: 12)
-        l.textColor = l.getModeTextColor()
-        return l
+    
+    // MARK: - UIViews
+    
+    let shadowView = UIView()
+
+    lazy var circle: UIView = {
+        let v = UIView()
+        v.height(PrivateConstants.circleSize)
+        v.width(PrivateConstants.circleSize)
+        v.addCornerRadius(radius: PrivateConstants.circleSize/2)
+        return v
     }()
     
-    lazy var buildByLabel: UILabel = {
-        let l = UILabel()
-        l.font = UIFont.regular(size: 12)
-        l.textColor = l.getModeTextColor()
-        l.text = "build_by".localized
-        return l
+    lazy var bottomView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        v.addSubview(buildByStackView)
+        v.addSubview(starTodayStackView)
+        starTodayStackView.edgesToSuperview(excluding: .left)
+        buildByStackView.edgesToSuperview(excluding: .right)
+        return v
     }()
+
+    // MARK: - StackViews
     
     lazy var languageStackView: HorizontalStackView = {
         let stack = HorizontalStackView(arrangedSubviews: [circle, languageLabel])
@@ -149,17 +151,6 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         let stack = HorizontalStackView(arrangedSubviews: [])
         return stack
     }()
-
-    lazy var bottomView: UIView = {
-        let v = UIView()
-        v.backgroundColor = .clear
-        v.addSubview(buildByStackView)
-        v.addSubview(starTodayStackView)
-        starTodayStackView.edgesToSuperview(excluding: .left)
-        buildByStackView.edgesToSuperview(excluding: .right)
-//        buildByStackView.rightToLeft(of: starTodayStackView, offset: -10)
-        return v
-    }()
     
     lazy var horizontalStackView: HorizontalStackView = {
         let stack = HorizontalStackView(arrangedSubviews: [languageStackView, starStackView, forkStackView])
@@ -171,8 +162,6 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         let stack = VerticalStackView(arrangedSubviews: [nameLabel, descriptionLabel, horizontalStackView, bottomView])
         return stack
     }()
-    
-    let shadowView = UIView()
     
     // MARK: - Initializers
     
@@ -205,8 +194,6 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
         backgroundColor = getModeColor()
-        nameLabel.textColor = getModeTextColor()
-        descriptionLabel.textColor = getModeTextColor()
         selectionStyle = .none
         shadowView.backgroundColor = getModeColor()
         shadowView.addSubview(stackView)
@@ -225,8 +212,8 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         guard let data = data else { return }
         self.nameLabel.attributedText = data.getTitle()
         self.descriptionLabel.text = data.description
-        self.circle.backgroundColor = UIColor.init(hexString: data.languageColor ?? "#FFFFFF")
-        self.languageLabel.text = data.language
+        self.circle.backgroundColor = data.getColor() ?? getModeColor()
+        self.languageLabel.text = data.language ?? "unknown".localized
         self.starLabel.text = data.stars.description
         self.forkLabel.text = data.forks.description
         self.starTodayLabel.text = String(format: data.currentPeriodStars > 1 ? "stars_today".localized : "star_today".localized, data.currentPeriodStars)

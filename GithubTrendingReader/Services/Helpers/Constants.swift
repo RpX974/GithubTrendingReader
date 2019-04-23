@@ -23,10 +23,16 @@ struct Constants {
     static let github: String = "https://github.com"
     static let languageURL: String = "https://github-trending-api.now.sh/languages"
     static let allLanguagesURL: String = "https://github-trending-api.now.sh/repositories?since=%@"
-    static let defaultLanguage: String = "All Languages"
-    static let defaultLanguageUrlParam: String = "allLanguages"
     static let maxRecentsCount: Int = 10
 
+    // MARK: - Languages
+
+    struct Languages {
+        static let defaultLanguage: String = "All Languages"
+        static let defaultLanguageUrlParam: String = "allLanguages"
+        static let allLanguages: String = "All Languages"
+        static let allLanguagesUrlParam: String = "allLanguages"
+    }
     // MARK: - UserDefault
     
     struct UserDefault {

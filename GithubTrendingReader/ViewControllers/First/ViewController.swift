@@ -172,7 +172,9 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
         viewModel.dataSource.forEach{ $0.refreshHTML() }
         viewModel.getFavoritesViewModel().refreshHTML()
         if let indexs = tableView.indexPathsForVisibleRows {
-            tableView.reloadRows(at: indexs, with: .none)
+            UIView.performWithoutAnimation {
+                tableView.reloadRows(at: indexs, with: .none)
+            }
         }
         log_info("DarkMode is \(bool ? "enabled" : "disabled")")
     }
@@ -189,9 +191,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
         case .languages:
             log_info("Cell tapped at \(indexPath) from LanguagesTableView")
             viewModel.setCurrentLanguage(data: data, indexPath: indexPath)
-            if search.isActive == true {
-                search.isActive = false
-            }
+            if search.isActive == true { search.isActive = false }
         default:
             log_info("Cell tapped at \(indexPath) from defaultTableView")
             showDetails(index: indexPath.item)
@@ -279,7 +279,8 @@ extension ViewController: HomeProtocolDelegate {
         Animator.addCATransition(view: tableView)
         tableView.alpha = alpha
         DispatchQueue.main.async {
-            self.segmentedControl.isEnabled = self.title == "loading".localized ? false : true
+            self.segmentedControl.isEnabled = !isUpdating
+            self.scrollToTop()
             self.showActivityIndicator(bool: isUpdating)
         }
     }

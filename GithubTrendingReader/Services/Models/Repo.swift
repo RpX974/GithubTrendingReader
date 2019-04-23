@@ -17,16 +17,19 @@ typealias Repos = [Repo]
 // MARK: - BuiltBy
 
 struct BuiltBy: Codable {
+
+    // MARK: - Properties
+
     let username: String
     let href, avatar: String
 }
 
 // MARK: - Repo
 
-class Repo: Codable {
+class Repo: Cloud & Codable {
     
     // MARK: - Properties
-
+    
     let author, name: String
     let url: String
     let description: String
@@ -37,13 +40,6 @@ class Repo: Codable {
     var html: String?
 
     // MARK: - Custom Functions
-
-    func getTitle() -> NSMutableAttributedString {
-        let attributedText = NSMutableAttributedString(string: author, attributes: [NSAttributedString.Key.font: UIFont.regular(size: 20)])
-        attributedText.append(NSAttributedString(string: " / \(name)", attributes: [NSAttributedString.Key.font: UIFont.bold(size: 20)]))
-        return attributedText
-    }
-    
     // MARK: - SETTERS
     
     fileprivate func setHTML() -> Promise<String> {
@@ -78,9 +74,22 @@ class Repo: Codable {
         createHTML()
     }
     
-    // MARK: - GETTER
+    // MARK: - GETTERS
+    
+    func getTitle() -> NSMutableAttributedString {
+        let attributedText = NSMutableAttributedString(string: author, attributes: [NSAttributedString.Key.font: UIFont.regular(size: 20)])
+        attributedText.append(NSAttributedString(string: " / \(name)", attributes: [NSAttributedString.Key.font: UIFont.bold(size: 20)]))
+        return attributedText
+    }
 
     func getHTML(_ completion: ResultCompletion<String>?) {
         createHTML(completion: completion)
+    }
+    
+    func getColor() -> UIColor? {
+        let color = languageColor != nil ?
+                    UIColor.init(hexString: languageColor ?? "#FFFFFF") :
+                    nil
+        return color
     }
 }

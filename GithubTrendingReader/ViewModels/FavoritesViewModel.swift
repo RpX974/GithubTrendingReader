@@ -18,23 +18,29 @@ class FavoritesViewModel: GenericDataSourceViewModel<Repo> {
     }
     
     // MARK: - Properties
-
-    fileprivate var favorites: [Data] {
-        get {
-            if dataSource.count == 0 { dataSource = Data.retrieveArray(forKey: Constants.UserDefault.favorites) ?? [] }
-            return dataSource
-        }
-        set {
-            newValue.saveArray(forKey: Constants.UserDefault.favorites)
-            dataSource = newValue
-        }
+    // MARK - Initializers
+    
+    required init() {
+        super.init()
+        retriveFromCloud()
     }
     
-    // MARK - Initializers    
+    func retriveFromCloud() {
+        Data.retrieveFromCloud(completion: { [weak self] result in
+            guard let `self` = self else { return }
+            switch result {
+            case .success(let data):
+                self.dataSource = data
+            case .failure(let error):
+                log_error(error.localizedDescription)
+            }
+        })
+    }
+    
     // MARK: - SETTER
     
     func refreshHTML(){
-        self.favorites.forEach({ $0.refreshHTML() })
+        self.dataSource.forEach({ $0.refreshHTML() })
     }
 
     func addFavorite(repo: Data?) -> Bool {
@@ -44,32 +50,22 @@ class FavoritesViewModel: GenericDataSourceViewModel<Repo> {
             return false
         }
         removeFavorite(repo: data)
-        favorites.insert(data, at: 0)
+        dataSource.insert(data, at: 0)
         log_info("Repo added to Favorites")
+        data.saveInCloud()
         return true
     }
     
     func removeFavorite(repo: Data?) {
-        guard let data = repo, let index = favorites.findIndex(predicate: {$0.url == data.url}) else { return }
-        favorites.remove(at: index)
+        guard let data = repo, let index = dataSource.findIndex(predicate: {$0.url == data.url}) else { return }
+        data.removeFromCloud()
+        dataSource.remove(at: index)
     }
 
     // MARK: - GETTER
-        
+    
     func checkIfFavoriteExists(repo: Data?) -> Bool {
         guard let data = repo else { return true }
-        return favorites.contains(where: {$0.url == data.url }) ? true : false
-    }
-    
-    override func getDataFrom(index: Int) -> Data? {
-        return index < favorites.count ? favorites[index] : nil
-    }
-    
-    override func getDataSource() -> [Data] {
-        return favorites
-    }
-    
-    override func getListDataSource() -> [[Data]?] {
-        return [favorites]
+        return dataSource.contains(where: {$0.url == data.url }) ? true : false
     }
 }

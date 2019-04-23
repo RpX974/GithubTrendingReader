@@ -40,7 +40,7 @@ class API {
 
     func getUrlString(from language: String, since: Since) -> String{
         switch language {
-        case Constants.defaultLanguageUrlParam:
+        case Constants.Languages.defaultLanguageUrlParam:
             return String.init(format: Constants.allLanguagesURL, since.rawValue)
         default:
             return String.init(format: Constants.baseUrl, language, since.rawValue)

@@ -20,9 +20,6 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     // MARK: - Constants
     
     struct PrivateConstants {
-        static let defaultLanguage: Language = Language.init(urlParam: Constants.defaultLanguageUrlParam, name: Constants.defaultLanguage)
-        static let defaultSince: Since = .daily
-        
         struct Format {
             static func recents(count: Int) -> String { return String(format: "recents".localized, count) }
             static func populars(count: Int) -> String { return String(format: "populars".localized, count) }
@@ -36,7 +33,8 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
     
     fileprivate let repoViewModel           = RepoViewModel()
     fileprivate let languagesViewModel      = LanguagesViewModel()
-    fileprivate lazy var favoritesViewModel : FavoritesViewModel = { return FavoritesViewModel() }()
+    fileprivate let favoritesViewModel      = FavoritesViewModel()
+//    fileprivate lazy var favoritesViewModel : FavoritesViewModel = { return FavoritesViewModel() }()
     
     fileprivate var _currentSince   : Since?
     fileprivate var filtering       = false
@@ -107,7 +105,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         }
     }
     
-    // MARK: - SETTERS
+    // MARK: - SETTERSfa
     
     func setDelegate(delegate: HomeProtocolDelegate) {
         self.delegate = delegate

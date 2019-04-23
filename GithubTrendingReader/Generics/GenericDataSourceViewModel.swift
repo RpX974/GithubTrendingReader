@@ -28,11 +28,13 @@ class GenericDataSourceViewModel<Data: Codable> {
         return dataSource.count
     }
     
-    // MARK: - Custom Functions
-    // MARK: - GETTER
-    
+    // MARK - Initializers
+
     required init() {
     }
+    
+    // MARK: - Custom Functions
+    // MARK: - GETTERS
     
     func getDataSource() -> [Data] {
         return dataSource

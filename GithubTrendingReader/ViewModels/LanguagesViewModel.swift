@@ -25,14 +25,15 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
     // MARK: - Constants
     
     struct PrivateConstants {
-        static let defaultLanguage: Language = Language.init(urlParam: Constants.defaultLanguageUrlParam, name: Constants.defaultLanguage)
+        static let defaultLanguage: Language = Language.init(urlParam: Constants.Languages.defaultLanguageUrlParam, name: Constants.Languages.defaultLanguage)
+        static let allLanguages: Language = Language.init(urlParam: Constants.Languages.allLanguagesUrlParam, name: Constants.Languages.allLanguages)
         static let defaultSince: Since = .daily
     }
     
     // MARK: - Properties
     
     fileprivate var popular: Languages = []
-    fileprivate var _recents: Languages?
+    fileprivate var recents: Languages = []
     fileprivate var _currentLanguage: Language?
 
     fileprivate var currentLanguage: Language {
@@ -46,16 +47,25 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
         }
     }
 
-    fileprivate var recents: Languages {
-        get {
-            return _recents ?? Language.retrieveArray(forKey: Constants.UserDefault.recents) ?? []
-        }
-        set {
-            newValue.saveArray(forKey: Constants.UserDefault.recents)
-            _recents = newValue
-        }
+    // MARK - Initializers
+    
+    required init() {
+        super.init()
+        retriveFromCloud()
     }
 
+    func retriveFromCloud() {
+        Data.retrieveFromCloud(completion: { [weak self] result in
+            guard let `self` = self else { return }
+            switch result {
+            case .success(let data):
+                self.recents = data
+            case .failure(let error):
+                log_error(error.localizedDescription)
+            }
+        })
+    }
+    
     // MARK: - SETTERS
 
     func setCurrentLanguage(language: Language) {
@@ -64,12 +74,18 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
     
     func appendRecent(recent: Language?){
         guard let recent = recent else { return }
-        if let index = recents.findIndex(predicate: {$0.name == recent.name}) {
-            recents.remove(at: index)
-        }
+        let removed = removeRecent(recent: recent)
         if recents.count == Constants.maxRecentsCount { recents.removeLast() }
         recents.insert(recent, at: 0)
         currentLanguage = recent
+        guard let data = removed else { recent.saveInCloud(); return }
+        data.updateInCloud()
+    }
+    
+    func removeRecent(recent: Language) -> Language? {
+        guard let index = recents.findIndex(predicate: {$0.name == recent.name}) else { return nil }
+        let recent = recents.remove(at: index)
+        return recent
     }
     
     // MARK: - GETTERS
@@ -104,8 +120,7 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
                     log_info("All Languages retrieved")
                     self.dataSource = data.all
                     self.popular = data.popular
-                    let allLanguages = Language.init(urlParam: Constants.defaultLanguageUrlParam,
-                                                     name: Constants.defaultLanguage)
+                    let allLanguages = PrivateConstants.allLanguages
                     self.popular.insert(allLanguages, at: 0)
                     fullfill(())
                 case .failure(let error):

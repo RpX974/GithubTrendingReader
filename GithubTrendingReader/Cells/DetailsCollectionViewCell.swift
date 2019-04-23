@@ -84,7 +84,7 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
         }
     }
     
-    // MARK: - Delegation
+    // MARK: - Delegate
     // MARK: - WebView
     
     func didTapOnImage(url: String) {

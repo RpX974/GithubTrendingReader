@@ -8,6 +8,8 @@
 
 import UIKit
 
+// MARK: - Protocol
+
 protocol NavigationControllerDelegate: class {
     func setTapGestureAction() -> Selector?
 }
@@ -20,7 +22,9 @@ extension UIViewController: NavigationControllerDelegate {
     @objc func setTapGestureAction() -> Selector? { return nil }
 }
 
-class NavigationController: UINavigationController, UINavigationControllerDelegate {
+// MARK: - NavigationController
+
+class NavigationController: UINavigationController {
     
     // MARK: - Properties
     
@@ -45,11 +49,7 @@ class NavigationController: UINavigationController, UINavigationControllerDelega
         navigationBar.prefersLargeTitles = true
     }
     
-    func clearNavigationBar() {
-        navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationBar.shadowImage = UIImage()
-        view.backgroundColor = .clear
-    }
+    // MARK: - Gestures
     
     func addTapGesture(target: UIViewController, action: Selector){
         tapGesture = UITapGestureRecognizer.init(target: target, action: action)
@@ -60,6 +60,20 @@ class NavigationController: UINavigationController, UINavigationControllerDelega
         guard let tap = tapGesture else { return }
         navigationBar.removeGestureRecognizer(tap)
     }
+    
+    // MARK: - Custom Functions
+    
+    func clearNavigationBar() {
+        navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationBar.shadowImage = UIImage()
+        view.backgroundColor = .clear
+    }
+}
+
+// MARK: - Extension
+// MARK: - Delegate
+
+extension NavigationController: UINavigationControllerDelegate {
     
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         globalDelegate = viewController

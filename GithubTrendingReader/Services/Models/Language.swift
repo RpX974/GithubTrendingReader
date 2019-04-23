@@ -22,7 +22,7 @@ struct AllLanguages: Codable {
 
 // MARK: - All
 
-struct Language: Codable {
+class Language: Cloud & Codable {
     // MARK: - Properties
 
     let urlParam, name: String

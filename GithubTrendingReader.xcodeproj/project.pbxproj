@@ -14,11 +14,14 @@
 		AC0FAFF5226285D800A0E151 /* DetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0FAFF4226285D800A0E151 /* DetailsViewController.swift */; };
 		AC0FAFF722629BBB00A0E151 /* styleios.css in Resources */ = {isa = PBXBuildFile; fileRef = AC0FAFF622629BBB00A0E151 /* styleios.css */; };
 		AC0FAFF92262DA9900A0E151 /* styleios-white.css in Resources */ = {isa = PBXBuildFile; fileRef = AC0FAFF82262DA9800A0E151 /* styleios-white.css */; };
+		AC125AA3226EB15600CB93AE /* Cloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC125AA2226EB15600CB93AE /* Cloud.swift */; };
 		AC19EF74226977C3003BE92E /* GenericController+UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC19EF73226977C3003BE92E /* GenericController+UITableView.swift */; };
 		AC3FABF42266036C0038B6AE /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3FABF32266036C0038B6AE /* SegmentedControl.swift */; };
 		AC54E1A62268EE5500979B6E /* FavoritesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC54E1A52268EE5500979B6E /* FavoritesViewModel.swift */; };
 		AC54E1A922691B6800979B6E /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC54E1A822691B6800979B6E /* FavoritesViewController.swift */; };
 		AC5703812262FF3300B8206C /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5703802262FF3300B8206C /* NavigationController.swift */; };
+		AC781B9E226F5DEA00330341 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC781B9D226F5DEA00330341 /* Label.swift */; };
+		AC781BA0226F73D100330341 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC781B9F226F73D100330341 /* CloudKit.framework */; };
 		ACAF6347226263040022B2DA /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF6346226263040022B2DA /* Extensions.swift */; };
 		ACAF6349226263110022B2DA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF6348226263110022B2DA /* Constants.swift */; };
 		ACAF634B226267AF0022B2DA /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAF634A226267AF0022B2DA /* API.swift */; };
@@ -54,11 +57,15 @@
 		AC0FAFF4226285D800A0E151 /* DetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewController.swift; sourceTree = "<group>"; };
 		AC0FAFF622629BBB00A0E151 /* styleios.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = styleios.css; sourceTree = "<group>"; };
 		AC0FAFF82262DA9800A0E151 /* styleios-white.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "styleios-white.css"; sourceTree = "<group>"; };
+		AC125A91226E5FD400CB93AE /* GithubTrendingReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GithubTrendingReader.entitlements; sourceTree = "<group>"; };
+		AC125AA2226EB15600CB93AE /* Cloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cloud.swift; sourceTree = "<group>"; };
 		AC19EF73226977C3003BE92E /* GenericController+UITableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GenericController+UITableView.swift"; sourceTree = "<group>"; };
 		AC3FABF32266036C0038B6AE /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
 		AC54E1A52268EE5500979B6E /* FavoritesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewModel.swift; sourceTree = "<group>"; };
 		AC54E1A822691B6800979B6E /* FavoritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
 		AC5703802262FF3300B8206C /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
+		AC781B9D226F5DEA00330341 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
+		AC781B9F226F73D100330341 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		ACAF6346226263040022B2DA /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		ACAF6348226263110022B2DA /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		ACAF634A226267AF0022B2DA /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
@@ -93,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC781BA0226F73D100330341 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +112,14 @@
 			children = (
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		A95279C1A5A469F47DDC9DAE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AC781B9F226F73D100330341 /* CloudKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		AC0FAFEC2262737D00A0E151 /* Generics */ = {
@@ -135,7 +151,6 @@
 		ACAF633C226261770022B2DA /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				AC5703802262FF3300B8206C /* NavigationController.swift */,
 				ACAF63442262625B0022B2DA /* First */,
 				AC0FAFF3226285CB00A0E151 /* Details */,
 				AC54E1A722691B4D00979B6E /* Favorites */,
@@ -173,6 +188,7 @@
 				ACAF6346226263040022B2DA /* Extensions.swift */,
 				ACC699A72263D216005C1F00 /* Protocols.swift */,
 				ACC9FAD722648B7B00CEB8A7 /* Enum.swift */,
+				AC125AA2226EB15600CB93AE /* Cloud.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -188,12 +204,14 @@
 		ACAF63422262623B0022B2DA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				AC5703802262FF3300B8206C /* NavigationController.swift */,
 				ACC699A32263D186005C1F00 /* StackView.swift */,
 				AC3FABF32266036C0038B6AE /* SegmentedControl.swift */,
 				ACE07109226618AA0079CFCB /* SearchViewController.swift */,
 				ACD3823922665E5B00C5AE8A /* TableView.swift */,
 				ACD1BED822675A3B000D278B /* CollectionView.swift */,
 				ACD382432266B9F900C5AE8A /* WebView.swift */,
+				AC781B9D226F5DEA00330341 /* Label.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -251,6 +269,7 @@
 				ACF92BF722625F1200A6809B /* GithubTrendingReader */,
 				ACF92BF622625F1200A6809B /* Products */,
 				6D773A1DC69FE507FFCE0B5B /* Pods */,
+				A95279C1A5A469F47DDC9DAE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -265,6 +284,7 @@
 		ACF92BF722625F1200A6809B /* GithubTrendingReader */ = {
 			isa = PBXGroup;
 			children = (
+				AC125A91226E5FD400CB93AE /* GithubTrendingReader.entitlements */,
 				ACF92BF822625F1200A6809B /* AppDelegate.swift */,
 				ACF92BFF22625F1300A6809B /* Assets.xcassets */,
 				ACAF6345226262640022B2DA /* Storyboards */,
@@ -312,6 +332,14 @@
 				TargetAttributes = {
 					ACF92BF422625F1200A6809B = {
 						CreatedOnToolsVersion = 10.1;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -380,9 +408,11 @@
 				AC19EF74226977C3003BE92E /* GenericController+UITableView.swift in Sources */,
 				AC54E1A62268EE5500979B6E /* FavoritesViewModel.swift in Sources */,
 				ACD382422266B4C800C5AE8A /* ClassHelper.swift in Sources */,
+				AC781B9E226F5DEA00330341 /* Label.swift in Sources */,
 				ACC699A42263D186005C1F00 /* StackView.swift in Sources */,
 				ACAF634B226267AF0022B2DA /* API.swift in Sources */,
 				ACD0A157226BEE21009F75EF /* RepoViewModel.swift in Sources */,
+				AC125AA3226EB15600CB93AE /* Cloud.swift in Sources */,
 				AC3FABF42266036C0038B6AE /* SegmentedControl.swift in Sources */,
 				AC0FAFF5226285D800A0E151 /* DetailsViewController.swift in Sources */,
 			);
@@ -538,6 +568,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = GithubTrendingReader/GithubTrendingReader.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 5W2S372WGF;
@@ -558,6 +589,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = GithubTrendingReader/GithubTrendingReader.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5W2S372WGF;
 				INFOPLIST_FILE = GithubTrendingReader/Info.plist;
