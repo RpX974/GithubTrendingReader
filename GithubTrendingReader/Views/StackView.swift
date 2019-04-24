@@ -10,7 +10,7 @@ import UIKit
 
 class HorizontalStackView: UIStackView {
     
-    // MARK - Initializers
+    // MARK: - Initializers
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,7 +24,7 @@ class HorizontalStackView: UIStackView {
     
     // MARK: - View Configuration
 
-    private func setupUI(){
+    private func setupUI() {
         backgroundColor = .clear
         axis = .horizontal
         alignment = .center
@@ -35,7 +35,7 @@ class HorizontalStackView: UIStackView {
 
 class VerticalStackView: UIStackView {
     
-    // MARK - Initializers
+    // MARK: - Initializers
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,7 +49,7 @@ class VerticalStackView: UIStackView {
     
     // MARK: - View Configuration
 
-    private func setupUI(){
+    private func setupUI() {
         backgroundColor = .clear
         axis = .vertical
         alignment = .leading

@@ -59,7 +59,7 @@ class DetailsViewController: UIViewController {
     fileprivate lazy var viewModel = DetailsViewModel(delegate: self)
     fileprivate var favoritesViewModel: FavoritesViewModel!
     
-    // MARK - Closures
+    // MARK: - Closures
     
     var scrollToIndex: ((Int) -> Void)?
     var showWebImage: ((String) -> Void)?
@@ -99,7 +99,7 @@ class DetailsViewController: UIViewController {
         Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
     }
     
-    fileprivate func setupUI(){
+    fileprivate func setupUI() {
         extendedLayoutIncludesOpaqueBars = true
         view.backgroundColor = view.getModeColor()
         view.clipsToBounds = true
@@ -107,11 +107,11 @@ class DetailsViewController: UIViewController {
         setupNavigationBar()
     }
     
-    fileprivate func addAllSubviews(){
+    fileprivate func addAllSubviews() {
         view.addSubview(collectionView)
     }
     
-    fileprivate func setupNavigationBar(){
+    fileprivate func setupNavigationBar() {
         navigationItem.setRightBarButton(image: PrivateConstants.rightBarButtonImage,
                                          target: self,
                                          action: #selector(self.goToSafari),
@@ -119,11 +119,11 @@ class DetailsViewController: UIViewController {
         navigationItem.rightBarButtonItems?.append(favoriteButton)
     }
     
-    fileprivate func setupConstraints(){
+    fileprivate func setupConstraints() {
         collectionView.edgesToSuperview(usingSafeArea: true)
     }
     
-    fileprivate func setupShowWebImage(){
+    fileprivate func setupShowWebImage() {
         showWebImage = { [weak self] url in
             guard let `self` = self else { return }
             let appImage = ViewerImage.appImage(forUrl: url)
@@ -136,7 +136,7 @@ class DetailsViewController: UIViewController {
         }
     }
     
-    fileprivate func setupNotificationCenter(){
+    fileprivate func setupNotificationCenter() {
         NotificationCenter.default.addObserver(self, selector: #selector(self.orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
@@ -150,7 +150,7 @@ class DetailsViewController: UIViewController {
     
     // MARK: - Custom Functions
     
-    @objc fileprivate func scrollToTop(){
+    @objc fileprivate func scrollToTop() {
         guard let cell = self.collectionView.cellForItem(at: .init(item: viewModel.getCurrentIndex(), section: 0))
         as? DetailsCollectionViewCell
         else { return }
@@ -158,14 +158,14 @@ class DetailsViewController: UIViewController {
         
     }
 
-    @objc fileprivate func goToSafari(){
+    @objc fileprivate func goToSafari() {
         guard let repo = viewModel.getDataFromCurrentIndex(), let url = URL.init(string: repo.url) else { return }
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
     
-    @objc fileprivate func addToFavorite(){
+    @objc fileprivate func addToFavorite() {
         let isFavorite = favoritesViewModel.addFavorite(repo: viewModel.getDataFromCurrentIndex())
         updateFavoriteImage(isFavorite: isFavorite)
     }
@@ -181,7 +181,7 @@ class DetailsViewController: UIViewController {
     
     fileprivate func setScrollIndicatorColor(color: UIColor) {
         for view in self.collectionView.subviews {
-            if view.isKind(of: UIImageView.self), let imageView = view as? UIImageView  {
+            if view.isKind(of: UIImageView.self), let imageView = view as? UIImageView {
                 imageView.image = nil
                 view.backgroundColor = color
             }
@@ -225,7 +225,7 @@ extension DetailsViewController: DetailsViewProtocolDelegate {
         log_info("Title updated to \(title ?? "No Title")")
     }
     
-    func updateFavoriteImage(isFavorite: Bool){
+    func updateFavoriteImage(isFavorite: Bool) {
         self.favoriteButton.image = isFavorite ? "favorite_full".image : "favorite".image
         log_info("Repo is \(isFavorite ? "" : "not ")in Favorite")
     }

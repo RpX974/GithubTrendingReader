@@ -10,6 +10,8 @@ import Foundation
 
 class DetailsViewModel: GenericDataSourceViewModel<Repo> {
     
+    // MARK: - Typealiast
+    
     typealias Data = Repo
     
     // MARK: - Deinit
@@ -43,11 +45,11 @@ class DetailsViewModel: GenericDataSourceViewModel<Repo> {
     // MARK: - Custom Functions
     // MARK: - SETTER
     
-    func setCurrentIndex(index: Int){
+    func setCurrentIndex(index: Int) {
         currentIndex = index
     }
     
-    func setDataSource(data: [Data]){
+    func setDataSource(data: [Data]) {
         dataSource.removeAll()
         dataSource.append(contentsOf: data)
     }
@@ -58,7 +60,7 @@ class DetailsViewModel: GenericDataSourceViewModel<Repo> {
         return currentIndex
     }
     
-    func getDataFromCurrentIndex() -> Data?{
+    func getDataFromCurrentIndex() -> Data? {
         return getDataFrom(index: currentIndex)
     }
 }

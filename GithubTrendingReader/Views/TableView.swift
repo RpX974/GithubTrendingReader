@@ -98,7 +98,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     
     // MARK: - Initializers
     
-    convenience init(){
+    convenience init() {
         self.init(nil)
     }
     
@@ -155,11 +155,11 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         currentOrientation = UIDevice.current.orientation
     }
     
-    func register(cellClasses: [UITableViewCell.Type]){
+    func register(cellClasses: [UITableViewCell.Type]) {
         cellClasses.forEach({self.register($0.self, forCellReuseIdentifier: $0.stringClass)})
     }
     
-    func getData(with indexPath: IndexPath) -> Data?{
+    func getData(with indexPath: IndexPath) -> Data? {
         guard let dataSource = _dataSource, let data = dataSource[indexPath.section] else { return nil }
         if indexPath.section < dataSource.count && indexPath.row < data.count {
             return data[indexPath.item]
@@ -233,9 +233,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     
     // MARK: - SCROLLVIEW
 
-    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        
         if scrollView.contentOffset.y <= defaultYOffset || targetContentOffset.pointee.y < scrollView.contentOffset.y {
             // move up
             self.globalDelegate?.tableViewWillEndDragging(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset, isScrollingDown: false)

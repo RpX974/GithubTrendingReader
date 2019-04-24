@@ -9,7 +9,6 @@
 import Foundation
 
 class GenericDataSourceViewModel<Data: Codable> {
-    
     // MARK: - Deinit
     
     deinit {
@@ -28,7 +27,7 @@ class GenericDataSourceViewModel<Data: Codable> {
         return dataSource.count
     }
     
-    // MARK - Initializers
+    // MARK: - Initializers
 
     required init() {
     }

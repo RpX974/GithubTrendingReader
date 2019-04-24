@@ -28,7 +28,7 @@ class SegmentedControl: UISegmentedControl {
 
     weak var delegate: SegmentedControlDelegate?
 
-    // MARK - Initializers
+    // MARK: - Initializers
 
     convenience init(items: [Any]?, backgroundColor: UIColor = .white, tintColor: UIColor = .blue, textAttributes: [NSAttributedString.Key : Any]?, selectedIndex: Int = 0) {
         self.init(items: items)
@@ -48,7 +48,7 @@ class SegmentedControl: UISegmentedControl {
     
     // MARK: - Custom Functions
 
-    @objc fileprivate func indexChanged(_ sender: UISegmentedControl){
+    @objc fileprivate func indexChanged(_ sender: UISegmentedControl) {
         self.delegate?.indexChanged(sender)
     }
 }

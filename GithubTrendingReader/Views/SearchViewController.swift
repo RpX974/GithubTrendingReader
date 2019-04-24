@@ -47,7 +47,7 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return Constants.isDarkModeEnabled ? .lightContent : .default
     }
-    // MARK - Initializers
+    // MARK: - Initializers
 
     override init(searchResultsController: UIViewController?) {
         super.init(searchResultsController: searchResultsController)
@@ -81,7 +81,7 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
     
     // MARK: - Custom Functions
 
-    func updateDataToFilter(data: [T]?){
+    func updateDataToFilter(data: [T]?) {
         self.dataToFilter = data
     }
     

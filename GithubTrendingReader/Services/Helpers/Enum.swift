@@ -27,9 +27,9 @@ enum SinceIndex: Int {
 // MARK: - Since
 
 enum Since: String {
-    case daily = "daily"
-    case weekly = "weekly"
-    case monthly = "monthly"
+    case daily
+    case weekly
+    case monthly
     
     static func with(index: Int) -> Since {
         let rawValue = (SinceIndex(rawValue: index) ?? .daily).asString()
@@ -56,4 +56,3 @@ enum TableViewType {
 enum LanguagesType {
     case recents, popular, all
 }
-

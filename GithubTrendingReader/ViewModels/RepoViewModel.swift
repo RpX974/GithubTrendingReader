@@ -10,13 +10,11 @@ import Foundation
 import Promises
 
 class RepoViewModel: GenericDataSourceViewModel<Repo> {
-    
     // MARK: - Typealias
     
     typealias RequestResult = Repos
     
     // MARK: - Deinit
-    
     deinit {
         log_done()
     }
@@ -27,8 +25,9 @@ class RepoViewModel: GenericDataSourceViewModel<Repo> {
         dataSource.removeAll()
         return Promise<()>(on: .global(qos: .userInitiated), { [weak self] (fullfill, reject) in
             guard let `self` = self else { return }
-            API.shared.getTrending(fromLanguage: language.urlParam, since: since, completion: {
-                [weak self] (result: Result<RequestResult>) in
+            API.shared.getTrending(fromLanguage: language.urlParam,
+                                   since: since,
+                                   completion: { [weak self] (result: Result<RequestResult>) in
                 guard let `self` = self else { return }
                 switch result {
                 case .success(let data):

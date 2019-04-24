@@ -25,7 +25,7 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         static let circleSize: CGFloat = 15
         static let avatarSize: CGFloat = 20
         static let forkSize: CGFloat = 12
-        
+
         struct Image {
             static let star: UIImage? = "star".image
             static let fork: UIImage? = "fork".image
@@ -76,53 +76,52 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
     // MARK: - ImageViews
 
     lazy var star: UIImageView = {
-        let iv = UIImageView.init(image: PrivateConstants.Image.star)
-        iv.height(PrivateConstants.circleSize)
-        iv.width(PrivateConstants.circleSize)
-        iv.contentMode = .scaleAspectFit
-        iv.tintColor = iv.getModeTextColor().withAlphaComponent(0.8)
-        return iv
+        let imageView = UIImageView.init(image: PrivateConstants.Image.star)
+        imageView.height(PrivateConstants.circleSize)
+        imageView.width(PrivateConstants.circleSize)
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = imageView.getModeTextColor().withAlphaComponent(0.8)
+        return imageView
     }()
 
     lazy var starToday: UIImageView = {
-        let iv = UIImageView.init(image: PrivateConstants.Image.star)
-        iv.height(PrivateConstants.circleSize)
-        iv.width(PrivateConstants.circleSize)
-        iv.contentMode = .scaleAspectFit
-        iv.tintColor = iv.getModeTextColor().withAlphaComponent(0.8)
-        return iv
+        let imageView = UIImageView.init(image: PrivateConstants.Image.star)
+        imageView.height(PrivateConstants.circleSize)
+        imageView.width(PrivateConstants.circleSize)
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = imageView.getModeTextColor().withAlphaComponent(0.8)
+        return imageView
     }()
     
     lazy var fork: UIImageView = {
-        let iv = UIImageView.init(image: PrivateConstants.Image.fork)
-        iv.height(PrivateConstants.forkSize)
-        iv.width(PrivateConstants.forkSize)
-        iv.contentMode = .scaleAspectFit
-        iv.tintColor = iv.getModeTextColor().withAlphaComponent(0.8)
-        return iv
+        let imageView = UIImageView.init(image: PrivateConstants.Image.fork)
+        imageView.height(PrivateConstants.forkSize)
+        imageView.width(PrivateConstants.forkSize)
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = imageView.getModeTextColor().withAlphaComponent(0.8)
+        return imageView
     }()
-    
     
     // MARK: - UIViews
     
     let shadowView = UIView()
 
     lazy var circle: UIView = {
-        let v = UIView()
-        v.height(PrivateConstants.circleSize)
-        v.width(PrivateConstants.circleSize)
-        v.addCornerRadius(radius: PrivateConstants.circleSize/2)
-        return v
+        let view = UIView()
+        view.height(PrivateConstants.circleSize)
+        view.width(PrivateConstants.circleSize)
+        view.addCornerRadius(radius: PrivateConstants.circleSize/2)
+        return view
     }()
     
     lazy var bottomView: UIView = {
-        let v = UIView()
-        v.backgroundColor = .clear
-        v.addSubview(buildByStackView)
-        v.addSubview(starTodayStackView)
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.addSubview(buildByStackView)
+        view.addSubview(starTodayStackView)
         starTodayStackView.edgesToSuperview(excluding: .left)
         buildByStackView.edgesToSuperview(excluding: .right)
-        return v
+        return view
     }()
 
     // MARK: - StackViews
@@ -190,7 +189,7 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
     }
     
     // MARK: - Layout
-    fileprivate func setupUI(){
+    fileprivate func setupUI() {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
         backgroundColor = getModeColor()
@@ -221,22 +220,22 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
         self.buildByStackView.isHidden = data.builtBy.count > 0 ? false : true
     }
     
-    fileprivate func createBuildByImageViews(data: Repo){
-        self.buildByStackView.arrangedSubviews.forEach( {
+    fileprivate func createBuildByImageViews(data: Repo) {
+        self.buildByStackView.arrangedSubviews.forEach({
             if $0.isKind(of: UIImageView.self) {
                 $0.removeFromSuperview()
             }
         })
-        let ivs: [UIImageView] = data.builtBy.map { (buildBy) in
-            let iv = UIImageView()
-            iv.height(PrivateConstants.avatarSize)
-            iv.width(PrivateConstants.avatarSize)
-            iv.backgroundColor = .clear
-            iv.addCornerRadius(radius: 2)
-            self.buildByStackView.addArrangedSubview(iv)
-            return iv
+        let imageViews: [UIImageView] = data.builtBy.map { _ in
+            let imageView = UIImageView()
+            imageView.height(PrivateConstants.avatarSize)
+            imageView.width(PrivateConstants.avatarSize)
+            imageView.backgroundColor = .clear
+            imageView.addCornerRadius(radius: 2)
+            self.buildByStackView.addArrangedSubview(imageView)
+            return imageView
         }
-        if ivs.count > 0 {
+        if imageViews.count > 0 {
             switch UIScreen.main.sizeType {
             case .iPhone4, .iPhone5:
                 horizontalStackView.addArrangedSubview(buildByLabel)
@@ -245,9 +244,9 @@ class RepoTableViewCell: GenericTableViewCell<Repo> {
             }
         }
         DispatchQueue.global().async {
-            for (index, iv) in ivs.enumerated() {
+            for (index, elem) in imageViews.enumerated() {
                 let url = URL(string: data.builtBy[index].avatar)
-                iv.sd_setImage(with: url, placeholderImage: nil, options: [SDWebImageOptions.scaleDownLargeImages, SDWebImageOptions.highPriority], completed: nil)
+                elem.sd_setImage(with: url, placeholderImage: nil, options: [SDWebImageOptions.scaleDownLargeImages, SDWebImageOptions.highPriority], completed: nil)
             }
         }
     }

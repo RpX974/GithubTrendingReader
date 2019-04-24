@@ -16,9 +16,9 @@ class FavoritesViewModel: GenericDataSourceViewModel<Repo> {
     deinit {
         log_done()
     }
-    
+
     // MARK: - Properties
-    // MARK - Initializers
+    // MARK: - Initializers
     
     required init() {
         super.init()
@@ -39,7 +39,7 @@ class FavoritesViewModel: GenericDataSourceViewModel<Repo> {
     
     // MARK: - SETTER
     
-    func refreshHTML(){
+    func refreshHTML() {
         self.dataSource.forEach({ $0.refreshHTML() })
     }
 

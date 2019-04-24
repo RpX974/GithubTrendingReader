@@ -20,15 +20,15 @@ protocol CollectionViewProtocol: class {
 // MARK: - Protocol Optional Methods
 
 extension CollectionViewProtocol {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath, data: Decodable?){}
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath, data: Decodable?) {}
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, cell: UICollectionViewCell, data: Decodable?) -> UICollectionViewCell? { return nil }
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, currentIndex: Int){}
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, currentIndex: Int) {}
 }
 
 // MARK: - GenericCell
 
 class GenericCollectionViewCell<Data: Decodable>: UICollectionViewCell {
-    func configure(with data: Data?){}
+    func configure(with data: Data?) {}
 }
 
 // MARK: - CollectionView
@@ -61,7 +61,7 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
     fileprivate var defaultYOffset: CGFloat = 0.0
     weak var globalDelegate: CollectionViewProtocol?
     
-    // MARK - Initializers
+    // MARK: - Initializers
     
     convenience init(frame: CGRect = .zero,
                      layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout(),
@@ -93,7 +93,7 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         defaultYOffset = yOffSet > 0.0 ? 0.0 : yOffSet
     }
     
-    fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets){
+    fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets) {
         guard let text = noDataText else { return }
         self.noDataLabel.text = text
         self.addSubview(noDataLabel)
@@ -104,7 +104,7 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
     
     // MARK: - Custom Functions
     
-    func getData(with indexPath: IndexPath) -> Data?{
+    func getData(with indexPath: IndexPath) -> Data? {
         guard let dataSource = _dataSource, let data = dataSource[indexPath.section] else { return nil }
         if indexPath.section < dataSource.count && indexPath.row < data.count {
             return data[indexPath.item]
@@ -112,7 +112,7 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         return nil
     }
     
-    func showNoDataLabel(count: Int){
+    func showNoDataLabel(count: Int) {
         noDataLabel.isHidden = count > 0 ? true : false
     }
 

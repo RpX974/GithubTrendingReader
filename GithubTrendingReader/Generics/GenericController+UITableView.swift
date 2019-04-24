@@ -43,11 +43,11 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     var titleToSet: String? {
         return self.stringClass()
     }
-    // MARK - Closures
+    // MARK: - Closures
 
     var scrollToIndex: ((Int) -> Void)!
     
-    // MARK - Initializers
+    // MARK: - Initializers
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -79,7 +79,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
         setScrollToIndex()
     }
     
-    func setupUI(){
+    func setupUI() {
         view.backgroundColor = view.getModeColor()
         view.clipsToBounds = true
         extendedLayoutIncludesOpaqueBars = true
@@ -87,15 +87,15 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
         addAllSubviews()
     }
     
-    func addAllSubviews(){
+    func addAllSubviews() {
         view.addSubview(tableView)
     }
 
-    func setupConstraints(){
+    func setupConstraints() {
         tableView.edgesToSuperview(excluding: .none, usingSafeArea: false)
     }
     
-    fileprivate func setScrollToIndex(){
+    fileprivate func setScrollToIndex() {
         scrollToIndex = { [weak self] index in
             guard let `self` = self else { return }
             self.tableView.scrollToRow(at: IndexPath.init(item: index, section: 0), at: .bottom, animated: true)
@@ -105,7 +105,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     
     // MARK: - Custom Functions
     
-    func showDetails(index: Int){
+    func showDetails(index: Int) {
         log_info("Cell tapped at \(index)")
         guard let favoritesViewModel = viewModel.getGenericViewModel() as? FavoritesViewModel else { return }
         let vc = DetailsViewController(favoritesViewModel: favoritesViewModel,
@@ -115,7 +115,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc func scrollToTop(){
+    @objc func scrollToTop() {
         self.tableView.scrollToTop()
     }
 

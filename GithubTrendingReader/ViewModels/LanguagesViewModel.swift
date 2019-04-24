@@ -47,7 +47,7 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
         }
     }
 
-    // MARK - Initializers
+    // MARK: - Initializers
     
     required init() {
         super.init()
@@ -72,7 +72,7 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
         currentLanguage = language
     }
     
-    func appendRecent(recent: Language?){
+    func appendRecent(recent: Language?) {
         guard let recent = recent else { return }
         let removed = removeRecent(recent: recent)
         if recents.count == Constants.maxRecentsCount { recents.removeLast() }
@@ -111,7 +111,7 @@ class LanguagesViewModel: GenericDataSourceViewModel<Language> {
     
     // MARK: - Requests
     
-    func start() -> Promise<()>{
+    func start() -> Promise<()> {
         return Promise<()>(on: .global(qos: .background), { (fullfill, reject) in
             API.shared.getAllLanguages(completion: { [weak self] (result: Result<RequestResult>) in
                 guard let `self` = self else { return }

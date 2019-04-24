@@ -83,7 +83,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
     fileprivate var bottomLanguagesTableViewConstraint: Constraint?
     fileprivate var topSegmentedControlConstraint: Constraint?
     
-    // MARK - Initializers
+    // MARK: - Initializers
     
     override func setViewModel(viewModel: HomeViewModel) {
         super.setViewModel(viewModel: viewModel)
@@ -107,7 +107,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
         view.addSubview(languagesTableView)
     }
     
-    fileprivate func setupNavigationBar(){
+    fileprivate func setupNavigationBar() {
         navigationItem.addSearchController(search)
         navigationItem.setLeftBarButton(image: HomeConstants.leftBarButtonImage,
                                         target: self,
@@ -146,7 +146,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
         Animator.animate(view: segmentedControl, alpha: 1, completion: nil)
     }
     
-    @objc fileprivate func showFavorites(){
+    @objc fileprivate func showFavorites() {
         let viewModel = self.viewModel.getFavoritesViewModel()
         let vc = FavoritesViewController(viewModel: viewModel)
         self.navigationController?.pushViewController(vc, animated: true)
@@ -155,7 +155,8 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
     
     @objc fileprivate func didReceiveKeyboardNotificationObserver(_ notification: Notification) {
         let userInfo = notification.userInfo
-        let keyboardFrame = (userInfo!["UIKeyboardFrameEndUserInfoKey"] as! NSValue).cgRectValue
+        guard let rect = userInfo!["UIKeyboardFrameEndUserInfoKey"] as? NSValue else { return }
+        let keyboardFrame = rect.cgRectValue
         self.bottomLanguagesTableViewConstraint?.constant = -keyboardFrame.size.height
     }
     
@@ -164,12 +165,12 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
     }
     
     fileprivate func enableDarkMode(bool: Bool) {
-        ClassHelper.changeModeColor(isDarkModeEnabled: bool, vc: self)
+        ClassHelper.changeModeColor(isDarkModeEnabled: bool, viewController: self)
         activityIndicator.color = view.getModeTextColor()
         navigationItem.rightBarButtonItem?.tintColor = view.getModeTextColor()
         navigationItem.leftBarButtonItem?.tintColor = view.getModeTextColor()
         navigationItem.leftBarButtonItem?.image = HomeConstants.leftBarButtonImage
-        viewModel.dataSource.forEach{ $0.refreshHTML() }
+        viewModel.dataSource.forEach { $0.refreshHTML() }
         viewModel.getFavoritesViewModel().refreshHTML()
         if let indexs = tableView.indexPathsForVisibleRows {
             UIView.performWithoutAnimation {
@@ -233,7 +234,7 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
 
 extension ViewController: SearchControllerDelegate {
     
-    func updateSearchResults<T>(for searchController: UISearchController, filteredData: [T], filtering: Bool) where T : Decodable, T : Encodable {
+    func updateSearchResults<T>(for searchController: UISearchController, filteredData: [T], filtering: Bool) where T: Decodable, T: Encodable {
         guard let data = filteredData as? [Language] else { viewModel.removeAllFilteredData(); return }
         viewModel.setFilteredData(data: data)
         self.reloadLanguagesTableView()
@@ -264,7 +265,7 @@ extension ViewController: SearchControllerDelegate {
 
 extension ViewController: SegmentedControlDelegate {
     
-    func indexChanged(_ sender: UISegmentedControl){
+    func indexChanged(_ sender: UISegmentedControl) {
         log_info("Current segmentedControl index: \(sender.selectedSegmentIndex)")
         viewModel.setCurrentSince(index: sender.selectedSegmentIndex)
     }
@@ -285,12 +286,12 @@ extension ViewController: HomeProtocolDelegate {
         }
     }
     
-    func reloadLanguagesTableView(){
+    func reloadLanguagesTableView() {
         languagesTableView.reloadData()
         languagesTableView.scrollToTop(animated: false)
     }
     
-    func updateLeftButtonBarTitle(languageName: String?){
+    func updateLeftButtonBarTitle(languageName: String?) {
         title = languageName ?? "loading".localized
         log_info("Title updated to \(title ?? "No Title")")
     }

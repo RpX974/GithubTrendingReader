@@ -46,7 +46,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
             getTrending()
         }
     }
-    fileprivate var currentSince    : Since {
+    fileprivate var currentSince: Since {
         get {
             if let since = _currentSince { return since }
             let index = UserDefaults.standard.integer(forKey: Constants.UserDefault.since)
@@ -66,10 +66,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         get { return repoViewModel.getDataSource() }
         set { repoViewModel.dataSource = newValue }
     }
-    
-    // MARK: - Initializers
-    
-    
+
     // MARK: - Start
     
     func start(){
@@ -111,7 +108,7 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         self.delegate = delegate
     }
     
-    func appendRecent(recent: Language?){
+    func appendRecent(recent: Language?) {
         languages.appendRecent(recent: recent)
     }
     
@@ -123,16 +120,16 @@ class HomeViewModel: GenericDataSourceViewModel<Repo> {
         currentLanguage = result
     }
     
-    func setFilteredData(data: [Language]){
+    func setFilteredData(data: [Language]) {
         removeAllFilteredData()
         filtered.append(contentsOf: data)
     }
     
-    func removeAllFilteredData(){
+    func removeAllFilteredData() {
         filtered.removeAll()
     }
     
-    func setCurrentSince(index: Int){
+    func setCurrentSince(index: Int) {
         currentSince = Since.with(index: index)
     }
     

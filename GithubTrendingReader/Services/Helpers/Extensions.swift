@@ -43,7 +43,7 @@ extension String: Localizable {
 
 // MARK: - String
 extension String {
-    var image : UIImage? {
+    var image: UIImage? {
         let image = UIImage.init(named: self)
         return image
     }
@@ -109,7 +109,7 @@ extension UIScrollView {
     var yOffSet: CGFloat { return contentOffset.y }
     var xOffSet: CGFloat { return contentOffset.x }
     
-    func setScrollIndicatorColor(color: UIColor){
+    func setScrollIndicatorColor(color: UIColor) {
         for view in self.subviews {
             if view.isKind(of: UIImageView.self), let imageView = view as? UIImageView  {
                 imageView.image = nil
@@ -118,7 +118,7 @@ extension UIScrollView {
         }
     }
     
-    @objc func scrollToTop(animated: Bool = false){
+    @objc func scrollToTop(animated: Bool = false) {
         self.setContentOffset(.zero, animated: animated)
     }
 }
@@ -127,7 +127,7 @@ extension UIScrollView {
 extension UITableView {
     override func scrollToTop(animated: Bool = false) {}
 
-    func scrollToFirstItem(animated: Bool = true){
+    func scrollToFirstItem(animated: Bool = true) {
         guard self.visibleCells.count > 0 else { return }
         self.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
     }
@@ -142,7 +142,7 @@ extension UITableView {
 extension UICollectionView {
     override func scrollToTop(animated: Bool = false) {}
 
-    func scrollToFirstItem(animated: Bool = true){
+    func scrollToFirstItem(animated: Bool = true) {
         guard self.visibleCells.count > 0 else { return }
         self.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: .top, animated: animated)
     }
@@ -171,7 +171,7 @@ extension UIView {
         self.layer.masksToBounds = false
     }
     
-    func addCornerRadius(radius: CGFloat){
+    func addCornerRadius(radius: CGFloat) {
         layer.cornerRadius = radius
         clipsToBounds = true
     }
@@ -241,7 +241,6 @@ extension Optional {
     }
 }
 
-
 extension UINavigationController {
     func multiLineNavigationTitle() {
         navigationBar.subviews.forEach {
@@ -280,7 +279,7 @@ extension UIColor {
     convenience init(hexString: String, alpha: CGFloat = 1.0) {
         let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         let scanner = Scanner(string: hexString)
-        if (hexString.hasPrefix("#")) {
+        if hexString.hasPrefix("#") {
             scanner.scanLocation = 1
         }
         var color: UInt32 = 0
@@ -292,7 +291,7 @@ extension UIColor {
         let red = CGFloat(r) / 255.0
         let green = CGFloat(g) / 255.0
         let blue = CGFloat(b) / 255.0
-        self.init(red:red, green:green, blue:blue, alpha:alpha)
+        self.init(red: red, green: green, blue: blue, alpha: alpha)
     }
     
     class func rbg(r: CGFloat, g: CGFloat, b: CGFloat) -> UIColor {
@@ -301,10 +300,10 @@ extension UIColor {
     }
 
     func toHexString() -> String {
-        var r:CGFloat = 0
-        var g:CGFloat = 0
-        var b:CGFloat = 0
-        var a:CGFloat = 0
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
         getRed(&r, green: &g, blue: &b, alpha: &a)
         let rgb:Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
         return String(format:"#%06x", rgb)
@@ -313,16 +312,13 @@ extension UIColor {
 
 // MARK: - UISearchBar
 extension UISearchBar {
-    
     private func getViewElement<T>(type: T.Type) -> T? {
-        
         let svs = subviews.flatMap { $0.subviews }
         guard let element = (svs.filter { $0 is T }).first as? T else { return nil }
         return element
     }
     
     func setTextFieldColor(color: UIColor) {
-        
         if let textField = getViewElement(type: UITextField.self) {
             switch searchBarStyle {
             case .minimal:
@@ -339,13 +335,13 @@ extension UISearchBar {
 // MARK: - UINavigationItem
 extension UINavigationItem {
     
-    func setRightBarButton(image: UIImage?, target: Any?, action: Selector?, tintColor: UIColor = .black){
+    func setRightBarButton(image: UIImage?, target: Any?, action: Selector?, tintColor: UIColor = .black) {
         let rightButtonBar = UIBarButtonItem.init(image: image, style: .plain, target: target, action: action)
         rightButtonBar.tintColor = tintColor
         self.rightBarButtonItem = rightButtonBar
     }
     
-    func setLeftBarButton(image: UIImage?, target: Any?, action: Selector?, tintColor: UIColor = .black){
+    func setLeftBarButton(image: UIImage?, target: Any?, action: Selector?, tintColor: UIColor = .black) {
         let leftButtonBar = UIBarButtonItem.init(image: image, style: .plain, target: target, action: action)
         leftButtonBar.tintColor = tintColor
         self.leftBarButtonItem = leftButtonBar
@@ -372,7 +368,12 @@ extension Encodable {
     }
     
     func string(using encoder: JSONEncoder = JSONEncoder()) -> String? {
-        return try! String(data: encoder.encode(self), encoding: .utf8)
+        do {
+            return try String(data: encoder.encode(self), encoding: .utf8)
+        } catch {
+            log_error(error.localizedDescription)
+            return nil
+        }
     }
 }
 
@@ -395,14 +396,14 @@ extension Decodable {
 extension UIScreen {
     
     enum SizeType: CGFloat {
-        case Unknown = 0.0
+        case unknown = 0.0
         case iPhone4 = 960.0
         case iPhone5 = 1136.0
     }
     
     var sizeType: SizeType {
         let height = nativeBounds.height
-        guard let sizeType = SizeType(rawValue: height) else { return .Unknown }
+        guard let sizeType = SizeType(rawValue: height) else { return .unknown }
         return sizeType
     }
 }

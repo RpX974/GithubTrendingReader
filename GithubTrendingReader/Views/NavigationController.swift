@@ -51,12 +51,12 @@ class NavigationController: UINavigationController {
     
     // MARK: - Gestures
     
-    func addTapGesture(target: UIViewController, action: Selector){
+    func addTapGesture(target: UIViewController, action: Selector) {
         tapGesture = UITapGestureRecognizer.init(target: target, action: action)
         navigationBar.addGestureRecognizer(tapGesture)
     }
     
-    func removeTapGesture(){
+    func removeTapGesture() {
         guard let tap = tapGesture else { return }
         navigationBar.removeGestureRecognizer(tap)
     }
@@ -74,7 +74,7 @@ class NavigationController: UINavigationController {
 // MARK: - Delegate
 
 extension NavigationController: UINavigationControllerDelegate {
-    
+
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         globalDelegate = viewController
         guard let action = self.globalDelegate?.setTapGestureAction() else { return }

@@ -14,13 +14,13 @@ class Animator {
 
     // MARK: - Custom Functions
     
-    static func animate(animations: @escaping (()->Void), duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+    static func animate(animations: @escaping (()->Void), duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?) {
         DispatchQueue.main.async {
             UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: animations, completion: completion)
         }
     }
     
-    static func animate(view: UIView, alpha: CGFloat, duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+    static func animate(view: UIView, alpha: CGFloat, duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?) {
         DispatchQueue.main.async {
             
         }
@@ -29,7 +29,7 @@ class Animator {
         }, completion: completion)
     }
     
-    static func animate(views: [UIView], alphas: [CGFloat], duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+    static func animate(views: [UIView], alphas: [CGFloat], duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?) {
         DispatchQueue.main.async {
             UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 for (index, view) in views.enumerated() {
@@ -39,7 +39,7 @@ class Animator {
         }
     }
     
-    static func animate(view: UIView, duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+    static func animate(view: UIView, duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?) {
         DispatchQueue.main.async {
             UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {
                 view.layoutIfNeeded()
@@ -47,7 +47,7 @@ class Animator {
         }
     }
     
-    static func animate(view: UIView?, transform: CGAffineTransform , duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?){
+    static func animate(view: UIView?, transform: CGAffineTransform , duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: ((Bool)->())?) {
         guard let view = view else { return }
         DispatchQueue.main.async {
             UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.8, initialSpringVelocity: 5, options: .curveEaseInOut, animations: {

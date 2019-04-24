@@ -27,7 +27,7 @@ class Language: Cloud & Codable {
 
     let urlParam, name: String
     
-    // MARK - Initializers
+    // MARK: - Initializers
 
     init(urlParam: String, name: String) {
         self.urlParam = urlParam

@@ -17,7 +17,7 @@ protocol WebViewProtocolDelegate: class {
 }
 
 extension WebViewProtocolDelegate {
-    func didTapOnImage(url: String){}
+    func didTapOnImage(url: String) {}
     func setImageFormats() -> [String] {
         return [".png", ".jpg", ".jpeg"]
     }
@@ -38,7 +38,7 @@ class WebView: UIWebView {
 
     weak var globalDelegate: WebViewProtocolDelegate?
     
-    // MARK - Initializers
+    // MARK: - Initializers
     
     init() {
         super.init(frame: .zero)
@@ -77,7 +77,7 @@ extension WebView: UIWebViewDelegate {
             if let url = request.url {
                 var showImage = false
                 let imageFormats = self.globalDelegate?.setImageFormats()
-                imageFormats?.forEach( { string in
+                imageFormats?.forEach({ string in
                     if url.absoluteString.hasSuffix(string) {
                         if url.absoluteString.hasPrefix(self.globalDelegate?.prefixToAvoid() ?? "") { return }
                         showImage = true

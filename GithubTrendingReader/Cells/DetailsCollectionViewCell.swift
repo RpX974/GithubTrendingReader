@@ -28,16 +28,16 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
     // MARK: - Views
 
     fileprivate lazy var webView: WebView = {
-        let w = WebView()
-        w.globalDelegate = self
-        return w
+        let webView = WebView()
+        webView.globalDelegate = self
+        return webView
     }()
 
-    // MARK - Closures
+    // MARK: - Closures
 
     var showWebImage: ((String) -> Void)?
 
-    // MARK - Initializers
+    // MARK: - Initializers
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -72,7 +72,7 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
     
     // MARK: - Custom Functions
     
-    fileprivate func loadWebView(repo: Repo){
+    fileprivate func loadWebView(repo: Repo) {
         repo.getHTML { [weak self] (result) in
             guard let `self` = self else { return }
             switch result {
@@ -95,7 +95,7 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
         return PrivateConstants.prefixToAvoid
     }
     
-    func scrollToTop(){
+    func scrollToTop() {
         webView.scrollView.scrollToTop(animated: true)
     }
 }

@@ -12,7 +12,7 @@ import Foundation
 
 typealias ResultCompletion<T> = (Result<T>) -> Void
 typealias ResultCompletionWithTU<T, U> = (Result<(T, U)>) -> Void
-typealias SuccessCallBack = () -> ()
+typealias SuccessCallBack = () -> Void
 
 // MARK: - Enum
 
@@ -38,7 +38,7 @@ class API {
     
     // MARK: - Custom Functions
 
-    func getUrlString(from language: String, since: Since) -> String{
+    func getUrlString(from language: String, since: Since) -> String {
         switch language {
         case Constants.Languages.defaultLanguageUrlParam:
             return String.init(format: Constants.allLanguagesURL, since.rawValue)
@@ -47,8 +47,8 @@ class API {
         }
     }
 
-    func retrieveData<T: Decodable>(with url: URL, completion: @escaping ResultCompletion<T>){
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
+    func retrieveData<T: Decodable>(with url: URL, completion: @escaping ResultCompletion<T>) {
+        URLSession.shared.dataTask(with: url) { (data, _, error) in
             if let error = error {
                 completion(.failure(error))
                 return
@@ -66,7 +66,7 @@ class API {
         }.resume()
     }
     
-    func getTrending<T: Decodable>(fromLanguage language: String, since: Since, completion: @escaping ResultCompletion<T>){
+    func getTrending<T: Decodable>(fromLanguage language: String, since: Since, completion: @escaping ResultCompletion<T>) {
         let urlString = self.getUrlString(from: language, since: since)
         guard let url = URL.init(string: urlString) else {
             log_error(ERROR.urlFailed.localizedDescription)
@@ -75,7 +75,7 @@ class API {
         self.retrieveData(with: url, completion: completion)
     }
     
-    func getAllLanguages<T: Decodable>(completion: @escaping ResultCompletion<T>){
+    func getAllLanguages<T: Decodable>(completion: @escaping ResultCompletion<T>) {
         let urlString = Constants.languageURL
         guard let url = URL.init(string: urlString) else {
             log_error(ERROR.urlFailed.localizedDescription)

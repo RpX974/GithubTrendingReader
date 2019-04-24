@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 
 class LanguageTableViewCell: GenericTableViewCell<Language> {
-        
     deinit {
         log_done()
     }
@@ -18,12 +17,12 @@ class LanguageTableViewCell: GenericTableViewCell<Language> {
     // MARK: - Views
 
     let separator: UIView = {
-        let v = UIView()
-        v.backgroundColor = Colors.lineGray
-        return v
+        let view = UIView()
+        view.backgroundColor = Colors.lineGray
+        return view
     }()
     
-    // MARK - Initializers
+    // MARK: - Initializers
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -38,7 +37,7 @@ class LanguageTableViewCell: GenericTableViewCell<Language> {
     
     // MARK: - View Configuration
 
-    fileprivate func setupUI(){
+    fileprivate func setupUI() {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
         textLabel?.textColor = getModeTextColor()

@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 
-
 // MARK: - Constants
 
 struct FavoritesConstants {
@@ -32,7 +31,7 @@ class FavoritesViewController<Cell: RepoTableViewCell, ViewModel: FavoritesViewM
     override var titleToSet: String? { return FavoritesConstants.titleToSet }
     override var noDataText: String? { return FavoritesConstants.noDataText }
     
-    // MARK - Initializers
+    // MARK: - Initializers
 
     override func viewDidLoad() {
         super.viewDidLoad()

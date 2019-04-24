@@ -20,7 +20,7 @@ class ClassHelper {
     
     // MARK: - Custom Functions
     
-    static func setupUIAppareance(isDarkModeEnabled: Bool = false){
+    static func setupUIAppareance(isDarkModeEnabled: Bool = false) {
         let barTintColor: UIColor = isDarkModeEnabled ? Colors.darkMode : .white
         let tintColor: UIColor = isDarkModeEnabled ? .white : Colors.darkMode
         let attrs = [NSAttributedString.Key.foregroundColor: tintColor]
@@ -35,7 +35,12 @@ class ClassHelper {
         UITextField.appearance().keyboardAppearance = isDarkModeEnabled ? .dark : .light
     }
 
-    static func showAlertView(parent: UIViewController, title: String, message: String, preferredStyle: UIAlertController.Style = .alert, tintColor: UIColor = .black, handlerAction: ((UIAlertAction) -> Void)?){
+    static func showAlertView(parent: UIViewController,
+                              title: String,
+                              message: String,
+                              preferredStyle: UIAlertController.Style = .alert,
+                              tintColor: UIColor = .black,
+                              handlerAction: ((UIAlertAction) -> Void)?) {
         let alert = UIAlertController.init(title: title, message: message, preferredStyle: preferredStyle)
         alert.view.tintColor = tintColor
         alert.addAction(UIAlertAction(title: PrivateConstants.AlertView.defaultTitleButton, style: .default, handler: handlerAction))
@@ -55,9 +60,9 @@ class ClassHelper {
                     label.setNeedsDisplay()
                 }
             case is UIImageView:
-                if let iv = view as? UIImageView {
-                    iv.tintColor = iv.getModeTextColor()
-                    iv.setNeedsDisplay()
+                if let imageView = view as? UIImageView {
+                    imageView.tintColor = imageView.getModeTextColor()
+                    imageView.setNeedsDisplay()
                 }
             default:
                 view.backgroundColor = view.getModeColor()
@@ -66,10 +71,10 @@ class ClassHelper {
         }
     }
 
-    static func changeModeColor(isDarkModeEnabled: Bool, vc: UIViewController){
+    static func changeModeColor(isDarkModeEnabled: Bool, viewController: UIViewController) {
         UserDefaults.standard.set(isDarkModeEnabled, forKey: Constants.UserDefault.darkMode)
         ClassHelper.setupUIAppareance(isDarkModeEnabled: isDarkModeEnabled)
-        let view: UIView = vc.view
+        let view: UIView = viewController.view
         let windows = UIApplication.shared.windows
         changeColorView(view: view)
         for window in windows {
@@ -78,10 +83,10 @@ class ClassHelper {
                 window.addSubview(view)
             }
         }
-        vc.setNeedsStatusBarAppearanceUpdate()
+        viewController.setNeedsStatusBarAppearanceUpdate()
     }
     
-    static func measureTime(completion: SuccessCallBack){
+    static func measureTime(completion: SuccessCallBack) {
         let start = CFAbsoluteTimeGetCurrent()
         completion()
         let diff = CFAbsoluteTimeGetCurrent() - start
