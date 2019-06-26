@@ -1,6 +1,6 @@
 # GithubTrendingReader
 
-![App Image](Screenshots/Assets.png?)
+![App Image](Screenshots/Asset.png?)
 
 iOS Application to read trending repositories
 
