@@ -12,6 +12,10 @@ import AppImageViewer
 
 class DetailsViewController: UIViewController {
     
+    // MARK: - Typealias
+
+    typealias Create = DetailsViewControllerUI
+    
     // MARK: - Deinit
     
     deinit {
@@ -19,45 +23,16 @@ class DetailsViewController: UIViewController {
         log_done()
     }
 
-    // MARK: - Constants
-
-    struct PrivateConstants {
-        static let alertTitle: String = "swipe_title".localized
-        static let alertMessage: String = "swipe_message".localized
-        static let darkModeEnabledImage: UIImage? = "moon".image
-        static let darkModeDisabledImage: UIImage? = "moonFull".image
-        static let rightBarButtonImage: UIImage? = "web".image
-        static var leftBarButtonImage: UIImage? {
-            return (Constants.isDarkModeEnabled ? PrivateConstants.darkModeEnabledImage : PrivateConstants.darkModeDisabledImage)
-        }
-
-    }
-    
     // MARK: - Views
     
-    fileprivate lazy var collectionView: CollectionView<Repo, DetailsCollectionViewCell> = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        let collectionView = CollectionView<Repo, DetailsCollectionViewCell>(
-                                            layout: layout,
-                                            backgroundColor: UIColor.clear,
-                                            isPagingEnabled: true,
-                                            noDataText: "no_repo".localized)
-        collectionView.globalDelegate = self
-        return collectionView
-    }()
-    
-    fileprivate lazy var favoriteButton: UIBarButtonItem = {
-        let b = UIBarButtonItem.init(image: "favorite".image, style: .plain, target: self, action: #selector(self.addToFavorite))
-        return b
-    }()
-    
+    fileprivate lazy var collectionView = Create.collectionView(delegate: self)
+    fileprivate lazy var favoriteButton = Create.favoriteButton(target: self, action: #selector(self.addToFavorite))
+
     // MARK: - Properties
 
     fileprivate var first = true
-    fileprivate lazy var viewModel = DetailsViewModel(delegate: self)
     fileprivate var favoritesViewModel: FavoritesViewModel!
+    fileprivate lazy var viewModel = DetailsViewModel(delegate: self)
     
     // MARK: - Closures
     
@@ -96,12 +71,12 @@ class DetailsViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: view.getModeTextColor())
+        Animator.setScrollIndicatorColor(scrollView: self.collectionView, color: Themes.current.textColor)
     }
     
     fileprivate func setupUI() {
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = view.getModeColor()
+        view.backgroundColor = Themes.current.color
         view.clipsToBounds = true
         addAllSubviews()
         setupNavigationBar()
@@ -112,15 +87,15 @@ class DetailsViewController: UIViewController {
     }
     
     fileprivate func setupNavigationBar() {
-        navigationItem.setRightBarButton(image: PrivateConstants.rightBarButtonImage,
+        navigationItem.setRightBarButton(image: Create.Image.rightBarButtonImage,
                                          target: self,
                                          action: #selector(self.goToSafari),
-                                         tintColor: view.getModeTextColor())
+                                         tintColor: Themes.current.textColor)
         navigationItem.rightBarButtonItems?.append(favoriteButton)
     }
     
     fileprivate func setupConstraints() {
-        collectionView.edgesToSuperview(usingSafeArea: true)
+        collectionView.fillSuperviewSafeAreaLayoutGuide()
     }
     
     fileprivate func setupShowWebImage() {
@@ -142,7 +117,7 @@ class DetailsViewController: UIViewController {
     
     fileprivate func showAlertView(){
         guard UserDefaults.standard.bool(forKey: Constants.UserDefault.swipe) == false else { return }
-        ClassHelper.showAlertView(parent: self, title: PrivateConstants.alertTitle, message: PrivateConstants.alertMessage, tintColor: Colors.darkMode, handlerAction: { _ in
+        ClassHelper.showAlertView(parent: self, title: Create.Text.alertTitle, message: Create.Text.alertMessage, tintColor: Colors.darkMode, handlerAction: { _ in
             UserDefaults.standard.set(true, forKey: Constants.UserDefault.swipe)
         })
         log_info("Swipe alert is currently displayed")
@@ -226,7 +201,7 @@ extension DetailsViewController: DetailsViewProtocolDelegate {
     }
     
     func updateFavoriteImage(isFavorite: Bool) {
-        self.favoriteButton.image = isFavorite ? "favorite_full".image : "favorite".image
+        self.favoriteButton.image = isFavorite ? Create.Image.favoriteFull : Create.Image.favorite
         log_info("Repo is \(isFavorite ? "" : "not ")in Favorite")
     }
 }

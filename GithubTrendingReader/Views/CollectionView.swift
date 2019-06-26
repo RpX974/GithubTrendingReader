@@ -73,10 +73,12 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
                      bounces: Bool = true,
                      alpha: CGFloat = 1.0,
                      noDataText: String? = nil,
-                     noDataTextInsets: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16)) {
+                     noDataTextInsets: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16),
+                     delegate: CollectionViewProtocol? = nil) {
         self.init(frame: frame, collectionViewLayout: layout)
         self.delegate = self
         self.dataSource = self
+        self.globalDelegate = delegate
         self.backgroundColor = backgroundColor
         self.bounces = bounces
         self.isPagingEnabled = isPagingEnabled
@@ -98,8 +100,8 @@ class CollectionView<Data: Decodable, CellType: GenericCollectionViewCell<Data>>
         self.noDataLabel.text = text
         self.addSubview(noDataLabel)
         self.noDataLabel.centerXToSuperview()
-        self.noDataLabel.edgesToSuperview(excluding: [.top, .bottom], insets: insets)
-        self.noDataLabel.topToSuperview(offset: insets.top)
+        self.noDataLabel.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: insets)
+//        self.noDataLabel.topToSuperview(offset: insets.top)
     }
     
     // MARK: - Custom Functions

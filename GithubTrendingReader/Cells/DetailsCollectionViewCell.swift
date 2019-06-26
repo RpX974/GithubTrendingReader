@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import TinyConstraints
 
 class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtocolDelegate {
     
@@ -27,11 +26,7 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
     
     // MARK: - Views
 
-    fileprivate lazy var webView: WebView = {
-        let webView = WebView()
-        webView.globalDelegate = self
-        return webView
-    }()
+    fileprivate lazy var webView = WebView(delegate: self)
 
     // MARK: - Closures
 
@@ -53,15 +48,14 @@ class DetailsCollectionViewCell: GenericCollectionViewCell<Repo>, WebViewProtoco
 
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-        webView.scrollView.setScrollIndicatorColor(color: self.getModeTextColor())
+        webView.scrollView.setScrollIndicatorColor(color: Themes.current.textColor)
     }
     
     // MARK: - View Configuration
 
-    
     fileprivate func setup() {
         contentView.addSubview(webView)
-        webView.edgesToSuperview(usingSafeArea: true)
+        webView.fillSuperviewSafeAreaLayoutGuide()
     }
     
     func configureCell(data: Repo?, showWebImage: ((String) -> Void)?) {

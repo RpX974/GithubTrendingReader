@@ -164,7 +164,7 @@ extension UIView {
         self.layer.shadowPath =
             UIBezierPath(roundedRect: self.bounds,
                          cornerRadius: self.layer.cornerRadius).cgPath
-        self.layer.shadowColor = getModeTextColor().cgColor
+        self.layer.shadowColor = Themes.current.textColor.cgColor
         self.layer.shadowOpacity = opacity
         self.layer.shadowOffset = offset ?? CGSize.init(width: 0, height: 3)
         self.layer.shadowRadius = radius
@@ -180,14 +180,13 @@ extension UIView {
         return "\(self)"
     }
     
-    func getModeColor() -> UIColor {
-        return Constants.isDarkModeEnabled ? Colors.darkMode : .white
-    }
-    
-    func getModeTextColor() -> UIColor {
-        return Constants.isDarkModeEnabled ? .white : Colors.darkMode
-    }
-
+//    func getModeColor() -> UIColor {
+//        return Constants.isDarkModeEnabled ? Colors.darkMode : .white
+//    }
+//
+//    func getModeTextColor() -> UIColor {
+//        return Constants.isDarkModeEnabled ? .white : Colors.darkMode
+//    }
 }
 
 extension Optional {
@@ -238,6 +237,14 @@ extension Optional {
         navigationController?.navigationBar.largeTitleTextAttributes =
             [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: fontSize)
         ]
+    }
+    
+    func addSubviews(_ views: UIView...) {
+        views.forEach { self.view.addSubview($0) }
+    }
+    
+    func addSubviews(_ views: [UIView]) {
+        views.forEach { self.view.addSubview($0) }
     }
 }
 
@@ -327,6 +334,7 @@ extension UISearchBar {
                 
             case .prominent, .default:
                 textField.backgroundColor = color
+            @unknown default: break
             }
         }
     }

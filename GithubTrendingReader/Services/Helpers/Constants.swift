@@ -8,17 +8,10 @@
 
 import UIKit
 
-// MARK: - Colors
-
-struct Colors {
-    static let lineGray: UIColor = UIColor.init(hex: 0x9B9B9B).withAlphaComponent(0.10)
-    static let darkMode: UIColor = UIColor.black
-}
 
 // MARK: - Constants
 
 struct Constants {
-    static var isDarkModeEnabled: Bool { return UserDefaults.standard.bool(forKey: Constants.UserDefault.darkMode) }
     static let baseUrl: String = "https://github-trending-api.now.sh/repositories?language=%@&since=%@"
     static let github: String = "https://github.com"
     static let languageURL: String = "https://github-trending-api.now.sh/languages"
@@ -63,6 +56,5 @@ struct Constants {
         static let replacingOf: String = "replacing_of".localized
         static let replacingWith: String = "replacing_with".localized
         static let urlFormat: String = "url_format".localized
-        
     }
 }

@@ -40,9 +40,9 @@ class WebView: UIWebView {
     
     // MARK: - Initializers
     
-    init() {
+    init(delegate: WebViewProtocolDelegate? = nil) {
         super.init(frame: .zero)
-        setup()
+        setup(delegate: delegate)
     }
     
 //    override init(frame: CGRect) {
@@ -55,8 +55,9 @@ class WebView: UIWebView {
         setup()
     }
     
-    private func setup() {
-        delegate = self
+    private func setup(delegate: WebViewProtocolDelegate? = nil) {
+        self.delegate = self
+        self.globalDelegate = delegate
         backgroundColor = .clear
         scrollView.backgroundColor = .clear
         isOpaque = false

@@ -16,11 +16,7 @@ class LanguageTableViewCell: GenericTableViewCell<Language> {
     
     // MARK: - Views
 
-    let separator: UIView = {
-        let view = UIView()
-        view.backgroundColor = Colors.lineGray
-        return view
-    }()
+    let separator = UIView(backgroundColor: Colors.lineGray)
     
     // MARK: - Initializers
 
@@ -40,14 +36,14 @@ class LanguageTableViewCell: GenericTableViewCell<Language> {
     fileprivate func setupUI() {
         backgroundColor = .clear
         contentView.backgroundColor = .clear
-        textLabel?.textColor = getModeTextColor()
+        textLabel?.textColor = Themes.current.textColor
         selectionStyle = .none
         self.addSubview(separator)
     }
     
     fileprivate func setupConstraints() {
-        separator.edgesToSuperview(excluding: .top, insets: .zero)
-        separator.height(0.5)
+        separator.fillSuperview().top?.isActive = false
+        separator.withHeight(0.5)
     }
     
     override func configure(with data: Language?) {

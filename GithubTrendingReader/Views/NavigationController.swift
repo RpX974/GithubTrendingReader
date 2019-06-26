@@ -33,7 +33,7 @@ class NavigationController: UINavigationController {
     weak var globalDelegate: NavigationControllerDelegate?
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return Constants.isDarkModeEnabled ? .lightContent : .default
+        return Themes.preferredStatusBarStyle
     }
 
     // MARK: - View Configuration
@@ -43,7 +43,7 @@ class NavigationController: UINavigationController {
         
         delegate = self
         extendedLayoutIncludesOpaqueBars = true
-        view.backgroundColor = view.getModeColor()
+        view.backgroundColor = Themes.current.color
         navigationItem.largeTitleDisplayMode = .automatic
         navigationBar.isTranslucent = false
         navigationBar.prefersLargeTitles = true

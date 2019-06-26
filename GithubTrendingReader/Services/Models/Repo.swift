@@ -51,7 +51,7 @@ class Repo: Cloud & Codable {
                     .replacingOccurrences(of: String(format: HTML.replacingOf, self.author, self.name), with:
                         String(format: HTML.replacingWith, Constants.github, self.author, self.name))
                     else { return }
-                let style = Constants.isDarkModeEnabled ? Constants.CSS.darkMode : Constants.CSS.whiteMode
+                let style = Themes.isDarkModeEnabled ? Constants.CSS.darkMode : Constants.CSS.whiteMode
                 self.html = String(format: HTML.urlFormat, style, contents)
                 fullfill(self.html ?? "")
             } catch let error {

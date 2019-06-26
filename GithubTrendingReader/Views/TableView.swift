@@ -60,7 +60,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         let label = UILabel()
         label.font = .bold(size: 20)
         label.textAlignment = .left
-        label.textColor = getModeTextColor()
+        label.textColor = Themes.current.textColor
         label.isHidden = true
         label.numberOfLines = 0
         return label
@@ -68,7 +68,20 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     
     // MARK: - Properties
     
+//    override func reloadData() {
+//        super.reloadData()
+//        __datasource = nil
+//    }
+    
+//    var __datasource: [[Data]?]?
+    
     fileprivate var _dataSource: [[Data]?]? {
+//        guard let dataSource = __datasource else {
+//            let test = globalDelegate?.setDataSource(self) as? [[Data]]
+//            __datasource = test
+//            return test
+//        }
+//        return dataSource
         return self.globalDelegate?.setDataSource(self) as? [[Data]]
     }
     
@@ -99,10 +112,10 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
     // MARK: - Initializers
     
     convenience init() {
-        self.init(nil)
+        self.init()
     }
     
-    convenience init(_ removeOrNil: Bool? = nil,
+    convenience init(frame: CGRect = .zero,
                      backgroundColor: UIColor? = .white,
                      rowHeight: CGFloat = UITableView.automaticDimension,
                      estimateRowHeight: CGFloat = 44.0,
@@ -112,10 +125,12 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
                      alpha: CGFloat = 1.0,
                      enableHighlight: Bool = false,
                      noDataText: String? = nil,
-                     noDataTextInsets: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16)) {
-        self.init(frame: .zero)
+                     noDataTextInsets: UIEdgeInsets = .init(top: 16, left: 16, bottom: 16, right: 16),
+                     delegate: TableViewProtocol? = nil) {
+        self.init(frame: frame)
         self.delegate = self
         self.dataSource = self
+        self.globalDelegate = delegate
         self.backgroundColor = backgroundColor
         self.rowHeight = rowHeight
         self.estimatedRowHeight = estimateRowHeight
@@ -137,7 +152,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         default:
             if landscapeYOffset == nil { landscapeYOffset = yOffSet }
         }
-        self.setScrollIndicatorColor(color: self.getModeTextColor())
+        self.setScrollIndicatorColor(color: Themes.current.textColor)
     }
     
     fileprivate func addNoDataLabel(noDataText: String?, insets: UIEdgeInsets){
@@ -145,8 +160,7 @@ class TableView<Data: Decodable, CellType: GenericTableViewCell<Data>>: UITableV
         self.noDataLabel.text = text
         self.addSubview(noDataLabel)
         self.noDataLabel.centerXToSuperview()
-        self.noDataLabel.edgesToSuperview(excluding: [.top, .bottom], insets: insets)
-        self.noDataLabel.topToSuperview(offset: insets.top)
+        self.noDataLabel.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: insets)
     }
     
     // MARK: - Custom Functions

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GDPerformanceView_Swift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,20 +16,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    // MARK - Initializers
+    // MARK: - Initializers
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication,didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         setupUIAppareance()
         setupWindow()
+        PerformanceMonitor.shared().start()
         return true
     }
     
-    func setupUIAppareance(){
-        ClassHelper.setupUIAppareance(isDarkModeEnabled: Constants.isDarkModeEnabled)
+    func setupUIAppareance() {
+        Themes.setupUIAppareance()
     }
     
-    func setupWindow(){
+    func setupWindow() {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = NavigationController.init(rootViewController: ViewController())
         window?.makeKeyAndVisible()

@@ -19,15 +19,12 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     
     // MARK: - Views
 
-    lazy var tableView: TableView<Data, Cell> = {
-        let tableView = TableView<Data, Cell>(backgroundColor: view.getModeColor(),
-                                              estimateRowHeight: 60.0,
-                                              contentInset: self.contentInset,
-                                              enableHighlight: true,
-                                              noDataText: noDataText)
-        tableView.globalDelegate = self
-        return tableView
-    }()
+    lazy var tableView: TableView<Data, Cell> = TableView(backgroundColor: Themes.current.color,
+                                                          estimateRowHeight: 60.0,
+                                                          contentInset: self.contentInset,
+                                                          enableHighlight: true,
+                                                          noDataText: noDataText,
+                                                          delegate: self)
     
     // MARK: - Properties
 
@@ -37,7 +34,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     var viewModel: ViewModel!
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return Constants.isDarkModeEnabled ? .lightContent : .default
+        return Themes.preferredStatusBarStyle
     }
     
     var titleToSet: String? {
@@ -80,7 +77,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     }
     
     func setupUI() {
-        view.backgroundColor = view.getModeColor()
+        view.backgroundColor = Themes.current.color
         view.clipsToBounds = true
         extendedLayoutIncludesOpaqueBars = true
         title = titleToSet
@@ -92,7 +89,7 @@ class GenericControllerWithTableView<Data: Repo, Cell: GenericTableViewCell<Data
     }
 
     func setupConstraints() {
-        tableView.edgesToSuperview(excluding: .none, usingSafeArea: false)
+        tableView.fillSuperview()
     }
     
     fileprivate func setScrollToIndex() {

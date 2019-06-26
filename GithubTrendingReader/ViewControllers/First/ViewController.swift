@@ -7,31 +7,16 @@
 //
 
 import UIKit
-import TinyConstraints
-
-// MARK: - Constants
-
-struct HomeConstants {
-    static let titleToSet: String = "loading".localized
-    static let noDataText: String = "no_repo".localized
-    static let cellSize: CGFloat = 80.0
-    static let segmentedControlItems: [String] = ["daily".localized, "weekly".localized, "monthly".localized]
-    static let darkModeEnabledImage: UIImage? = "moon".image
-    static let darkModeDisabledImage: UIImage? = "moonFull".image
-    static let rightBarButtonImage: UIImage? = "favorite_full".image
-    static var leftBarButtonImage: UIImage? {
-        return (Constants.isDarkModeEnabled ? HomeConstants.darkModeEnabledImage : HomeConstants.darkModeDisabledImage)
-    }
-    
-    static func titleFormat(string: String?) -> String { return string != nil ? String(format: "trending_format".localized, string ?? "", "trending".localized) : "loading".localized }
-}
 
 // MARK: - ViewController
 
 class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWithTableView<Repo, Cell, HomeViewModel> {
     
-    typealias ViewModel = HomeViewModel
+    // MARK: - Typealias
     
+    typealias ViewModel = HomeViewModel
+    typealias Create    = ViewControllerUI
+
     // MARK: - Deinit
     
     deinit {
@@ -43,34 +28,16 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
     
     fileprivate var webView: UIWebView!
     
-    fileprivate lazy var segmentedControl: SegmentedControl = {
-        let sc = SegmentedControl.init(items: HomeConstants.segmentedControlItems, backgroundColor: view.getModeColor(), tintColor: view.getModeTextColor(), textAttributes: [NSAttributedString.Key.font:UIFont.systemFont(ofSize: 14, weight: .semibold)], selectedIndex: viewModel.getCurrentSince())
-        sc.delegate = self
-        return sc
-    }()
-    fileprivate lazy var search: SearchController<Language> = {
-        let search = SearchController<Language>(placeholder: "other_language".localized, tintColor: view.getModeTextColor(), obscuresBackgroundDuringPresentation: false)
-        search.globalDelegate = self
-        return search
-    }()
-    fileprivate lazy var languagesTableView: TableView<Language, LanguageTableViewCell> = {
-        let tableView = TableView<Language, LanguageTableViewCell>(backgroundColor: view.getModeColor(),
-                                                              estimateRowHeight: 44.0,
-                                                              sectionHeaderHeight: 44.0,
-                                                              alpha: 0.0)
-        tableView.globalDelegate = self
-        return tableView
-    }()
-    fileprivate lazy var activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .white)
-        activityIndicator.color = view.getModeTextColor()
-        return activityIndicator
-    }()
+    fileprivate lazy var activityIndicator                  = Create.activityIndicator()
+    fileprivate lazy var languagesTableView                 = Create.languagesTableView(delegate: self)
+    fileprivate lazy var search: SearchController<Language> = Create.searchController(delegate: self)
+    fileprivate lazy var segmentedControl                   = Create.segmentedControl(selectedIndex: viewModel.getCurrentSince(),
+                                                                                      delegate: self)
     
     // MARK: - Properties
     
-    override var titleToSet: String? { return HomeConstants.titleToSet }
-    override var noDataText: String? { return HomeConstants.noDataText }
+    override var titleToSet: String? { return Create.Text.titleToSet }
+    override var noDataText: String? { return Create.Text.noDataText }
     override var contentInset: UIEdgeInsets {
         return .init(top: segmentedControl.height + 20.0,
                      left: 0,
@@ -81,7 +48,6 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
     // MARK: - Constraints
     
     fileprivate var bottomLanguagesTableViewConstraint: Constraint?
-    fileprivate var topSegmentedControlConstraint: Constraint?
     
     // MARK: - Initializers
     
@@ -95,41 +61,35 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
         
         log_start()
         setupNavigationBar()
-        setupNotificationKeyboard()
+        enableKeyboard(true)
         initFakeWebView()
         viewModel.start()
     }
     
     override func addAllSubviews() {
         super.addAllSubviews()
-        view.addSubview(languagesTableView)
-        view.addSubview(segmentedControl)
-        view.addSubview(languagesTableView)
+        addSubviews(languagesTableView, segmentedControl)
     }
     
     fileprivate func setupNavigationBar() {
         navigationItem.addSearchController(search)
-        navigationItem.setLeftBarButton(image: HomeConstants.leftBarButtonImage,
+        navigationItem.setLeftBarButton(image: Create.Image.leftBarButtonImage,
                                         target: self,
                                         action: #selector(changeMode),
-                                        tintColor: view.getModeTextColor())
-        navigationItem.setRightBarButton(image: HomeConstants.rightBarButtonImage,
+                                        tintColor: Themes.current.textColor)
+        navigationItem.setRightBarButton(image: Create.Image.rightBarButtonImage,
                                          target: self,
                                          action: #selector(showFavorites),
-                                         tintColor: view.getModeTextColor())
+                                         tintColor: Themes.current.textColor)
         navigationItem.rightBarButtonItems?.append(UIBarButtonItem(customView: activityIndicator))
     }
     
     override func setupConstraints() {
         super.setupConstraints()
-        segmentedControl.edgesToSuperview(excluding: [.top, .bottom], insets: .init(top: 0, left: 16, bottom: 0, right: 16), usingSafeArea: true)
-        topSegmentedControlConstraint = segmentedControl.topToSuperview(offset: 16.0, usingSafeArea: true)
-        languagesTableView.edgesToSuperview(excluding: .bottom, usingSafeArea: true)
-        bottomLanguagesTableViewConstraint = languagesTableView.bottomToSuperview()
-    }
-    
-    fileprivate func setupNotificationKeyboard(){
-        NotificationCenter.default.addObserver(self, selector: #selector(didReceiveKeyboardNotificationObserver(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        segmentedControl.fillSuperviewSafeAreaLayoutGuide(padding: Create.Rect.segmentedControlInsets).bottom?.isActive = false
+        languagesTableView.fillSuperviewSafeAreaLayoutGuide().bottom?.isActive = false
+        bottomLanguagesTableViewConstraint = languagesTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        bottomLanguagesTableViewConstraint?.isActive = true
     }
     
     fileprivate func initFakeWebView() {
@@ -152,24 +112,17 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
         self.navigationController?.pushViewController(vc, animated: true)
         log_info("Pushing to FavoritesViewController")
     }
-    
-    @objc fileprivate func didReceiveKeyboardNotificationObserver(_ notification: Notification) {
-        let userInfo = notification.userInfo
-        guard let rect = userInfo!["UIKeyboardFrameEndUserInfoKey"] as? NSValue else { return }
-        let keyboardFrame = rect.cgRectValue
-        self.bottomLanguagesTableViewConstraint?.constant = -keyboardFrame.size.height
-    }
-    
+
     @objc fileprivate func changeMode(){
-        self.enableDarkMode(bool: !Constants.isDarkModeEnabled)
+        self.enableDarkMode(bool: !Themes.isDarkModeEnabled)
     }
     
     fileprivate func enableDarkMode(bool: Bool) {
-        ClassHelper.changeModeColor(isDarkModeEnabled: bool, viewController: self)
-        activityIndicator.color = view.getModeTextColor()
-        navigationItem.rightBarButtonItem?.tintColor = view.getModeTextColor()
-        navigationItem.leftBarButtonItem?.tintColor = view.getModeTextColor()
-        navigationItem.leftBarButtonItem?.image = HomeConstants.leftBarButtonImage
+        Themes.changeCurrentTheme(viewController: self)
+        activityIndicator.color = Themes.current.textColor
+        navigationItem.rightBarButtonItem?.tintColor = Themes.current.textColor
+        navigationItem.leftBarButtonItem?.tintColor = Themes.current.textColor
+        navigationItem.leftBarButtonItem?.image = Create.Image.leftBarButtonImage
         viewModel.dataSource.forEach { $0.refreshHTML() }
         viewModel.getFavoritesViewModel().refreshHTML()
         if let indexs = tableView.indexPathsForVisibleRows {
@@ -217,8 +170,8 @@ class ViewController<Data: Repo, Cell: RepoTableViewCell>: GenericControllerWith
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
         header.addShadow(radius: 6, opacity: 0.05)
-        header.textLabel?.textColor = view.getModeTextColor()
-        header.backgroundView?.backgroundColor = view.getModeColor()
+        header.textLabel?.textColor = Themes.current.textColor
+        header.backgroundView?.backgroundColor = Themes.current.color
     }
     
     override func tableViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>, isScrollingDown: Bool) {
@@ -298,5 +251,13 @@ extension ViewController: HomeProtocolDelegate {
     
     func showActivityIndicator(bool: Bool) {
         bool ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+    }
+}
+
+// MARK: - KeyboardDelegate
+
+extension ViewController: KeyboardDelegate {
+    func keyboardFrame(_ notification: Notification, frame: CGRect) {
+        self.bottomLanguagesTableViewConstraint?.constant = -frame.size.height
     }
 }

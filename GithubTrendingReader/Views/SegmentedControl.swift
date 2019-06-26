@@ -30,12 +30,13 @@ class SegmentedControl: UISegmentedControl {
 
     // MARK: - Initializers
 
-    convenience init(items: [Any]?, backgroundColor: UIColor = .white, tintColor: UIColor = .blue, textAttributes: [NSAttributedString.Key : Any]?, selectedIndex: Int = 0) {
+    convenience init(items: [Any]?, backgroundColor: UIColor = .white, tintColor: UIColor = .blue, textAttributes: [NSAttributedString.Key : Any]?, selectedIndex: Int = 0, delegate: SegmentedControlDelegate? = nil) {
         self.init(items: items)
 
         self.backgroundColor = backgroundColor
         self.tintColor = tintColor
         self.selectedSegmentIndex = selectedIndex
+        self.delegate = delegate
         self.addTarget(self, action: #selector(self.indexChanged(_:)), for: .valueChanged)
         guard let attrs = textAttributes else { return }
         self.setTitleTextAttributes(attrs, for: .normal)

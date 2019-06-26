@@ -6,9 +6,9 @@ target 'GithubTrendingReader' do
   use_frameworks!
 
   # Pods for GithubTrendingReader
-  pod 'TinyConstraints', '~> 3.3.1'
-  pod 'PromisesSwift', '~> 1.2.7'
-  pod 'SDWebImage', '~> 4.4.6'
-  pod 'AppImageViewer', '~> 1.0.10'
+  pod 'PromisesSwift'
+  pod 'SDWebImage'
+  pod 'AppImageViewer'
+  pod 'GDPerformanceView-Swift'
   
 end

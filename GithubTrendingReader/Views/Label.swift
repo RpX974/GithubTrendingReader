@@ -10,20 +10,20 @@ import Foundation
 import UIKit
 
 class Label: UILabel {
-    
-    required init(text: String = "",
+
+    required init(text: String? = nil,
                   textColor: UIColor? = nil,
                   fontSize: CGFloat,
                   isBold: Bool = false,
                   isMultiline: Bool = false) {
         super.init(frame: .zero)
         self.text = text
-        self.textColor = textColor ?? getModeTextColor()
+        self.textColor = textColor ?? Themes.current.textColor
         self.font = isBold ? UIFont.boldSystemFont(ofSize: fontSize) : UIFont.systemFont(ofSize: fontSize)
         self.backgroundColor = .clear
         self.numberOfLines = isMultiline ? 0 : 1
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

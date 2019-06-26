@@ -45,7 +45,7 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
     weak var globalDelegate: SearchControllerDelegate?
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return Constants.isDarkModeEnabled ? .lightContent : .default
+        return Themes.preferredStatusBarStyle
     }
     // MARK: - Initializers
 
@@ -66,11 +66,12 @@ class SearchController<T: Codable>: UISearchController, UISearchResultsUpdating,
         
     }
     
-    convenience init(searchResultsController: UIViewController? = nil, placeholder: String?, tintColor: UIColor?, obscuresBackgroundDuringPresentation: Bool = true, dataToFilter: [T]? = nil) {
+    convenience init(searchResultsController: UIViewController? = nil, placeholder: String?, tintColor: UIColor?, obscuresBackgroundDuringPresentation: Bool = true, dataToFilter: [T]? = nil, delegate: SearchControllerDelegate? = nil) {
         self.init(searchResultsController: searchResultsController)
         
         self.searchResultsUpdater = self
         self.searchBar.delegate = self
+        self.globalDelegate = delegate
         self.delegate = self
         self.searchBar.placeholder = placeholder
         self.obscuresBackgroundDuringPresentation = obscuresBackgroundDuringPresentation
